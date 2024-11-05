@@ -17,6 +17,7 @@ public class House {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
     private String address;
 
     @OneToMany(mappedBy = "house")
