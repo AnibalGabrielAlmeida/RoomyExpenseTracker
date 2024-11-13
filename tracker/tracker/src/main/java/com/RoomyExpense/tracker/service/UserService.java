@@ -17,28 +17,31 @@ import java.util.*;
 
 @Service
 @Validated
-public class UserService {
+public class UserService implements  IUserService {
 
-  /*  @Autowired
+    @Autowired
     private UserRepository userRepository;
 
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
+    @Override
     public User saveUser(User user) {
         return userRepository.save(user);
     }
-
+    //check optional handling
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
+    @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
-   //think the update method
+   /*think the update method
    public User updateUser(Long id, @Valid UserUpdateDTO userUpdateDTO) {
        // Buscar el usuario existente
        User existingUser = userRepository.findById(id)

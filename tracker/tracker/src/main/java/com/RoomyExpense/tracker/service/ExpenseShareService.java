@@ -11,21 +11,9 @@ import java.util.Map;
 
 @Service
 public class ExpenseShareService {
-/*
-    @Autowired
+
+/*    @Autowired
     private ExpenseShareRepository expenseShareRepository;
-
-    public void createExpenseShares(Expense expense, Map<User, Double> userShares) {
-        userShares.forEach((user, percentage) -> {
-            ExpenseShare expenseShare = new ExpenseShare();
-            expenseShare.setExpense(expense);
-            expenseShare.setUser(user);
-            expenseShare.setSharePercentage(percentage);
-            expenseShare.setAmountToPay(expense.getAmount() * (percentage / 100));
-
-            // Guardar en la base de datos
-            expenseShareRepository.save(expenseShare);
-        });
-    }*/
+*/
 }
 
