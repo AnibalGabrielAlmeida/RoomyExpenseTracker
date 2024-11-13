@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class PaymentService {
-    @Autowired
+  /*  @Autowired
     private PaymentRepository paymentRepository;
 
     public List<Payment> getAllPayments(){
@@ -20,5 +20,5 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-
+*/
 }

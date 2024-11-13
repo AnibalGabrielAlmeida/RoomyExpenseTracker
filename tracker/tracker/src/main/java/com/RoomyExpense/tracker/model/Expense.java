@@ -13,13 +13,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "expenses")
 public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
     private String description;
     private Double amount;
-    private String category; // Ej.: "Fijo" o "Variable"
+
+    public enum Category {
+        FIXED, VARIABLE
+    }
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
     private LocalDate date;
 
     @ManyToOne
@@ -27,5 +35,5 @@ public class Expense {
     private House house;
 
     @OneToMany(mappedBy = "expense")
-    private List<Payment> payments;
+    private List<ExpenseShare> expenseShare;
 }
