@@ -21,7 +21,7 @@ public class User {
     private Long id;
     private String name;
     private String email;
-
+    //Add user authentication admin/roomy
     private String password;
      public enum Role {
         ADMIN, ROOMY

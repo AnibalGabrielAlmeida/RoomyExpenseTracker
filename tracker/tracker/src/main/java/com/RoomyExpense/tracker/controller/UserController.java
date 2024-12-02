@@ -1,13 +1,21 @@
 package com.RoomyExpense.tracker.controller;
 
+import com.RoomyExpense.tracker.DTO.UserCreationDTO;
+import com.RoomyExpense.tracker.DTO.UserDTO;
+import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
+import com.RoomyExpense.tracker.service.IHouseService;
 import com.RoomyExpense.tracker.service.IUserService;
-import com.RoomyExpense.tracker.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -15,30 +23,106 @@ public class UserController {
 
     @Autowired
     IUserService userService;
+    IHouseService houseService;
 
-    //add Response Entity to controllers
-    @GetMapping("/getAll")
-    public List<User> getAllUsers(){
-        return userService.getAllUsers();
-    }
-
-    @GetMapping("/getById/{id}")
-    public Optional<User> getUserByid(@PathVariable Long id){
-        return userService.getUserById(id);
-    }
 
     @PostMapping("/saveUser")
-    public User saveUser(@RequestBody User user){
-        return userService.saveUser(user);
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
+        // Verificar si la casa asociada existe
+        Optional<House> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
+        if (houseOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("La casa con ID " + userCreationDTO.getHouseId() + " no existe.");
+        }
+
+        // Mapea DTO a entidad
+        User user = new User();
+        user.setName(userCreationDTO.getName());
+        user.setEmail(userCreationDTO.getEmail());
+        user.setPassword(userCreationDTO.getPassword());
+        user.setPhoneNumber(userCreationDTO.getPhoneNumber());
+        user.setHouse(houseOptional.get());
+        user.setRole(User.Role.ROOMY); //todos arrancan como roomy y despues se asigna un admin.
+        user.setRegistrationDate(LocalDate.now());
+
+        // Guardar usuario
+        User savedUser = userService.saveUser(user);
+
+        // Mapea entidad a DTO para la respuesta
+        UserDTO userDTO = new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getRegistrationDate(),
+                user.getHouse() != null ? user.getHouse().getName() : null, // Nombre de la casa
+                user.getHouse() != null ? "/api/houses/" + user.getHouse().getId() : null, // URL de la casa
+                user.getRole().name() // Rol como string
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+    }
+
+
+    @GetMapping("/getAll")
+    public ResponseEntity<?> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+
+        if (users.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("No hay usuarios registrados actualmente.");
+        }
+
+        List<UserDTO> userDTOs = users.stream()
+                .map(user -> new UserDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getPhoneNumber(),
+                        user.getRegistrationDate(),
+                        user.getHouse() != null ? user.getHouse().getName() : null, // Nombre de la casa
+                        user.getHouse() != null ? "/api/houses/" + user.getHouse().getId() : null, // URL de la casa
+                        user.getRole().name() // Rol como string
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(userDTOs);
+    }
+
+
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        Optional<User> userOptional = userService.getUserById(id);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuario con ID " + id + " no encontrado.");
+        }
+
+        User user = userOptional.get();
+        UserDTO userDTO = new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getRegistrationDate(),
+                user.getHouse() != null ? user.getHouse().getName() : null, // Nombre de la casa
+                user.getHouse() != null ? "/api/houses/" + user.getHouse().getId() : null, // URL de la casa
+                user.getRole().name() // Rol como string
+        );
+
+        return ResponseEntity.ok(userDTO);
     }
 
     @DeleteMapping("/deleteById/{id}")
-    public void deleteUserById(@PathVariable Long id){
+    public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
+        Optional<User> userOptional = userService.getUserById(id);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Usuario con ID " + id + " no encontrado.");
+        }
+
         userService.deleteUser(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
     }
-
-
-
-
-
 }
