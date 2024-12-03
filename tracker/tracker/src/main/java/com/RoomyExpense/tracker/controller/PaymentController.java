@@ -1,10 +1,9 @@
 package com.RoomyExpense.tracker.controller;
 
-import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.model.Payment;
-import com.RoomyExpense.tracker.service.IExpenseService;
 import com.RoomyExpense.tracker.service.IPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,27 +12,41 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
-    @Autowired
-    IPaymentService paymentService;
 
-    //add Response Entity to controllers
+    @Autowired
+    private IPaymentService paymentService;
+
     @GetMapping("/getAll")
-    public List<Payment> getAllPayments() {
-        return paymentService.getAllPayments();
+    public ResponseEntity<List<Payment>> getAllPayments() {
+        List<Payment> payments = paymentService.getAllPayments();
+        if (payments.isEmpty()) {
+            return ResponseEntity.status(404).body(null); // Puedes manejar el caso de lista vacía si lo necesitas
+        }
+        return ResponseEntity.ok(payments);
     }
 
     @GetMapping("/getById/{id}")
-    public Optional<Payment> getPaymentByid(@PathVariable Long id) {
-        return paymentService.getPaymentById(id);
+    public ResponseEntity<Payment> getPaymentById(@PathVariable Long id) {
+        Optional<Payment> paymentOptional = paymentService.getPaymentById(id);
+        if (paymentOptional.isEmpty()) {
+            return ResponseEntity.status(404).body(null);
+        }
+        return ResponseEntity.ok(paymentOptional.get());
     }
 
     @PostMapping("/savePayment")
-    public Payment savePayment(@RequestBody Payment payment) {
-        return paymentService.savePayment(payment);
+    public ResponseEntity<Payment> savePayment(@RequestBody Payment payment) {
+        Payment savedPayment = paymentService.savePayment(payment);
+        return ResponseEntity.status(201).body(savedPayment); // 201: Created
     }
 
     @DeleteMapping("/deleteById/{id}")
-    public void deletePaymentById(@PathVariable Long id) {
+    public ResponseEntity<String> deletePaymentById(@PathVariable Long id) {
+        Optional<Payment> paymentOptional = paymentService.getPaymentById(id);
+        if (paymentOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Payment with ID " + id + " not found");
+        }
         paymentService.deletePayment(id);
+        return ResponseEntity.ok("Payment with ID " + id + " deleted successfully");
     }
 }
