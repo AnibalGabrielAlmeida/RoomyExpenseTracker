@@ -5,6 +5,7 @@ import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class HouseController {
     IHouseService houseService;
 
     @PostMapping("/saveHouse")
-    public ResponseEntity<HouseDTO> createHouse(@RequestBody HouseCreationDTO houseCreationDTO) {
+    public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
         // Mapea DTO a entidad
         House house = new House();
         house.setName(houseCreationDTO.getName());

@@ -22,9 +22,10 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
-    IUserService userService;
-    IHouseService houseService;
+    private IUserService userService;
 
+    @Autowired
+    private IHouseService houseService;
 
     @PostMapping("/saveUser")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
@@ -42,7 +43,7 @@ public class UserController {
         user.setPassword(userCreationDTO.getPassword());
         user.setPhoneNumber(userCreationDTO.getPhoneNumber());
         user.setHouse(houseOptional.get());
-        user.setRole(User.Role.ROOMY); //todos arrancan como roomy y despues se asigna un admin.
+        user.setRole(User.Role.ROOMY); // todos arrancan como roomy y despues se asigna un admin.
         user.setRegistrationDate(LocalDate.now());
 
         // Guardar usuario
@@ -50,19 +51,18 @@ public class UserController {
 
         // Mapea entidad a DTO para la respuesta
         UserDTO userDTO = new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getRegistrationDate(),
-                user.getHouse() != null ? user.getHouse().getName() : null, // Nombre de la casa
-                user.getHouse() != null ? "/api/houses/" + user.getHouse().getId() : null, // URL de la casa
-                user.getRole().name() // Rol como string
+                savedUser.getId(),
+                savedUser.getName(),
+                savedUser.getEmail(),
+                savedUser.getPhoneNumber(),
+                savedUser.getRegistrationDate(),
+                savedUser.getHouse() != null ? savedUser.getHouse().getName() : null, // Nombre de la casa
+                savedUser.getHouse() != null ? "/api/houses/" + savedUser.getHouse().getId() : null, // URL de la casa
+                savedUser.getRole().name() // Rol como string
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
-
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllUsers() {
@@ -87,7 +87,6 @@ public class UserController {
 
         return ResponseEntity.ok(userDTOs);
     }
-
 
     @GetMapping("/getById/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
