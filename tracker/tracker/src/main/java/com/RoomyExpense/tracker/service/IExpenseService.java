@@ -1,6 +1,7 @@
 package com.RoomyExpense.tracker.service;
 
 import com.RoomyExpense.tracker.model.Expense;
+import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 
 import java.util.List;
@@ -11,4 +12,6 @@ public interface IExpenseService {
     Optional<Expense> getExpenseById(Long id);
     void deleteExpense(Long id);
     Expense saveExpense(Expense expense);
+
+    List<Expense> getExpensesByHouse(House house);
 }

@@ -19,5 +19,6 @@ public class ExpenseDTO {
     private String category; // FIXED o VARIABLE
     private LocalDate date;
     private String houseName; // Nombre de la casa asociada al gasto.
+    private Long houseId;
 }
 

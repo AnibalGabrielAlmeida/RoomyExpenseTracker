@@ -2,6 +2,7 @@ package com.RoomyExpense.tracker.service;
 
 import com.RoomyExpense.tracker.DTO.ExpenseDTO;
 import com.RoomyExpense.tracker.model.Expense;
+import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,4 +39,8 @@ public class ExpenseService implements IExpenseService {
         expenseRepository.deleteById(id);
     }
 
+    @Override
+    public List<Expense> getExpensesByHouse(House house) {
+        return expenseRepository.findByHouse(house);
+    }
 }
