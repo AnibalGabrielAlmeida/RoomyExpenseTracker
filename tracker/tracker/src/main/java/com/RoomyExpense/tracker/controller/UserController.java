@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,6 +28,9 @@ public class UserController {
     @Autowired
     private IHouseService houseService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/saveUser")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
         // Verificar si la casa asociada existe
@@ -40,7 +44,9 @@ public class UserController {
         User user = new User();
         user.setName(userCreationDTO.getName());
         user.setEmail(userCreationDTO.getEmail());
-        user.setPassword(userCreationDTO.getPassword());
+        String encodedPassword = passwordEncoder.encode(user.getPassword()); // Cifra la contraseña
+        user.setPassword(encodedPassword);
+
         user.setPhoneNumber(userCreationDTO.getPhoneNumber());
         user.setHouse(houseOptional.get());
         user.setRole(User.Role.ROOMY); // todos arrancan como roomy y despues se asigna un admin.
