@@ -9,7 +9,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 @Service
 public class AuthService {
@@ -23,8 +26,8 @@ public class AuthService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder; // Codificador de contraseñas
 
-    // method para autenticar al usuario
-    public boolean authenticate(String email, String password) {
+    // Método para autenticar al usuario
+    public String authenticate(String email, String password) {
         try {
             // Existe el usuario?
             User user = userRepository.findByEmail(email)
@@ -40,13 +43,20 @@ public class AuthService {
                 // Almacenamos la autenticación en el contexto de seguridad
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                return true; // Autenticación exitosa
+                // Obtenemos el rol del usuario autenticado
+                Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+                String role = authorities.stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .findFirst()
+                        .orElse("USER"); // Si no tiene rol asignado, se asigna un rol por defecto
+
+                return role; // Retornamos el rol
             }
         } catch (Exception e) {
             // En caso de error (usuario no encontrado o contraseña incorrecta)
-            return false;
+            return null;
         }
 
-        return false; // Si las credenciales no son válidas
+        return null; // Si las credenciales no son válidas
     }
 }
