@@ -1,5 +1,7 @@
 package com.RoomyExpense.tracker.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,8 +24,10 @@ public class House {
     private String address;
 
     @OneToMany(mappedBy = "house")
+    @JsonBackReference
     private List<User> roommates;
 
     @OneToMany(mappedBy = "house")
+    @JsonManagedReference
     private List<Expense> expenses;
 }

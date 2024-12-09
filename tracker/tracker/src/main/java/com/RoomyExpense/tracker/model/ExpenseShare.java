@@ -1,4 +1,5 @@
 package com.RoomyExpense.tracker.model;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,10 +19,12 @@ public class ExpenseShare {
 
         @ManyToOne
         @JoinColumn(name = "expense_id")
+        @JsonBackReference
         private Expense expense;
 
         @ManyToOne
         @JoinColumn(name = "user_id")
+        @JsonBackReference
         private User user;
 
         private Double totalAmount;

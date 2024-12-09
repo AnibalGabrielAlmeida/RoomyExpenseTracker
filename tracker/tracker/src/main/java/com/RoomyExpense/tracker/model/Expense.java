@@ -1,5 +1,6 @@
 package com.RoomyExpense.tracker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class Expense {
 
     @ManyToOne
     @JoinColumn(name = "house_id")
+    @JsonIgnore
     private House house;
 
     @OneToMany(mappedBy = "expense")

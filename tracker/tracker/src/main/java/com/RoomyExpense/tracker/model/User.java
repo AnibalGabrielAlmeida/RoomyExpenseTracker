@@ -1,5 +1,7 @@
 package com.RoomyExpense.tracker.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,12 +25,12 @@ public class User {
     private String email;
     //Add user authentication admin/roomy
     private String password;
-     public enum Role {
+     public enum UserRole {
         ADMIN, ROOMY
     }
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private UserRole role;
 
     private LocalDate registrationDate;
 
@@ -38,8 +40,10 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "house_id")
+    @JsonBackReference
     private House house;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Payment> payments;
 }
