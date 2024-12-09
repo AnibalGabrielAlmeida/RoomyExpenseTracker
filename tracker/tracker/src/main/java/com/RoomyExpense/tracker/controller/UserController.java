@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
 
     @Autowired
@@ -44,8 +44,8 @@ public class UserController {
         User user = new User();
         user.setName(userCreationDTO.getName());
         user.setEmail(userCreationDTO.getEmail());
-        String encodedPassword = passwordEncoder.encode(user.getPassword()); // Cifra la contraseña
-        user.setPassword(encodedPassword);
+       // String encodedPassword = passwordEncoder.encode(user.getPassword()); // Cifra la contraseña
+        user.setPassword(passwordEncoder.encode(userCreationDTO.getPassword()));
 
         user.setPhoneNumber(userCreationDTO.getPhoneNumber());
         user.setHouse(houseOptional.get());

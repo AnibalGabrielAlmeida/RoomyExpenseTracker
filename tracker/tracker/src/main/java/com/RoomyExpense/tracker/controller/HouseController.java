@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/house")
+@RequestMapping("/api/house")
 public class HouseController {
 
     @Autowired
