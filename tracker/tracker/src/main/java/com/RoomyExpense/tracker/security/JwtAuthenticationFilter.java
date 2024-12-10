@@ -37,6 +37,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        String requestURI = request.getRequestURI();
+
+        // Ignorar rutas permitidas
+        if (requestURI.startsWith("/api/auth/")
+                || requestURI.startsWith("/api/user/saveUser")
+                || requestURI.startsWith("/api/house/saveHouse")
+                || requestURI.startsWith("/api/user/getAll")
+                || requestURI.startsWith("/api/house/getAll")) {
+            logger.info("Skipping JWT filter for permitted route: {}", requestURI);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authorizationHeader = request.getHeader("Authorization");
         String token = null;
         String email = null;
@@ -50,19 +64,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            logger.info("Email found in token: {}", email);
+            logger.info("Extracting role from token for email: {}", email);
             String role = jwtUtil.extractRole(token);
+            logger.info("Role extracted: {}", role);
 
             if (jwtUtil.validateToken(token, email)) {
+                logger.info("Token validated successfully for email: {}", email);
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
                                 email,
                                 null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                                List.of(new SimpleGrantedAuthority(role))
                         );
+                logger.info("AuthenticationToken created with authorities: {}", authenticationToken.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                logger.info("Authorities assigned: {}", authenticationToken.getAuthorities());
-                logger.info("Authentication successful for email: {} with role: {}", email, role);
+                logger.info("Authentication set in SecurityContextHolder for email: {}", email);
             } else {
                 logger.warn("Token validation failed for email: {}", email);
             }
@@ -70,4 +86,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }

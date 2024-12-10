@@ -17,7 +17,7 @@ public class JwtUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
     private final long EXPIRATION_TIME = 3600000L;
 
     public JwtUtil() {
@@ -34,7 +34,7 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(secretKey)
                 .compact();
-        logger.info("Token generated successfully for email: {}", email);
+        logger.info("Token generated: {} (truncated)", token.substring(0, 20)); // Truncate to avoid logging the full token
         return token;
     }
 
