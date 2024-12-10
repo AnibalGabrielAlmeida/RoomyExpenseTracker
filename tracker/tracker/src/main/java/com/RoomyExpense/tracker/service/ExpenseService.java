@@ -26,6 +26,7 @@ public class ExpenseService implements IExpenseService {
     //check optional handling
     @Override
     public Optional<Expense> getExpenseById(Long id){
+
         return  expenseRepository.findById(id);
     }
 

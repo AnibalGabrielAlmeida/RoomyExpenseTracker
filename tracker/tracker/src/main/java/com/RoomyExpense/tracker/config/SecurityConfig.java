@@ -2,6 +2,8 @@ package com.RoomyExpense.tracker.config;
 
 import com.RoomyExpense.tracker.security.JwtAuthenticationFilter;
 import com.RoomyExpense.tracker.service.UserDetailsServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,46 +17,47 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    // Bean para PasswordEncoder (utilizando BCrypt para cifrado de contraseñas)
     @Bean
     public PasswordEncoder passwordEncoder() {
+        logger.info("Configuring BCryptPasswordEncoder.");
         return new BCryptPasswordEncoder();
     }
 
-    // Bean para AuthenticationManager (configuración de Spring Security 6.x)
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder()); // Configuramos el UserDetailsService y el PasswordEncoder
+                .passwordEncoder(passwordEncoder());
+        logger.info("AuthenticationManager configured with UserDetailsService and PasswordEncoder.");
         return authenticationManagerBuilder.build();
     }
 
-    // Configuración de seguridad web jwt
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+        logger.info("Configuring SecurityFilterChain...");
         http
-                .csrf(csrf -> csrf.disable())  // Deshabilitamos CSRF para las APIs REST
-                .authorizeRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()  // Permite acceso sin autenticación a /api/auth/**
-                        .requestMatchers("/api/user/saveUser").permitAll()  // Permite creación de usuarios sin autenticación
-                        .requestMatchers("/api/house/saveHouse").permitAll()  // Permite creación de casas sin autenticación
-                        .requestMatchers("/api/user/getAll").permitAll()  // Permite obtener todos los usuarios sin autenticación
-                        .requestMatchers("/api/house/getAll").permitAll()  // Permite obtener todas las casas sin autenticación
-                        .requestMatchers("/admin/**").hasRole("ADMIN")  // Protege los endpoints para admins
-                        .requestMatchers("/roomy/**").hasRole("ROOMY")  // Protege los endpoints para roomies
-                        .anyRequest().authenticated()  // Requiere autenticación para cualquier otro endpoint
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()  // Public routes
+                        .requestMatchers("/api/user/saveUser").permitAll()
+                        .requestMatchers("/api/house/saveHouse").permitAll()
+                        .requestMatchers("/api/user/getAll").permitAll()
+                        .requestMatchers("/api/house/getAll").permitAll()
+                        .requestMatchers("/api/house/**").hasRole("ADMIN")  // Only accessible for ADMIN
+                        .requestMatchers("/api/house/delete").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/roomy/**").hasRole("ROOMY")
+                        .anyRequest().authenticated()  // Protect other routes
                 )
-                .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);  // Registra el filtro JWT en la cadena de seguridad
+                .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
 
-
+        logger.info("SecurityFilterChain configured with JwtAuthenticationFilter.");
         return http.build();
     }
-
-
-
 }

@@ -7,32 +7,35 @@ import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.repository.ExpenseRepository;
 import com.RoomyExpense.tracker.repository.ExpenseShareRepository;
 import com.RoomyExpense.tracker.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.NoSuchElementException;
 
 @Service
 public class ExpenseShareService {
 
     @Autowired
     private ExpenseShareRepository expenseShareRepository;
+
     @Autowired
     private ExpenseRepository expenseRepository;
+
     @Autowired
     private UserRepository userRepository;
 
     public ExpenseShare createExpenseShare(ExpenseShareCreationDTO dto) {
+        // Buscar la expensa por su ID
         Expense expense = expenseRepository.findById(dto.getExpenseId())
-                .orElseThrow(() -> {
-                    return new NoSuchElementException("Expense not found");
-                });
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Expense not found with ID: " + dto.getExpenseId()));
 
+        // Buscar el usuario por su ID
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + dto.getUserId()));
+
+        // Calcular la cantidad compartida por el usuario
         double sharedAmount = dto.getTotalAmount() * (dto.getDivisionPercentage() / 100);
 
+        // Crear y guardar el objeto ExpenseShare
         ExpenseShare expenseShare = new ExpenseShare();
         expenseShare.setExpense(expense);
         expenseShare.setUser(user);
@@ -42,6 +45,4 @@ public class ExpenseShareService {
 
         return expenseShareRepository.save(expenseShare);
     }
-
 }
-

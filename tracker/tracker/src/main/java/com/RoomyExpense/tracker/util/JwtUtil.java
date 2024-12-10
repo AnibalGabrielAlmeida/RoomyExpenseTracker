@@ -2,79 +2,84 @@ package com.RoomyExpense.tracker.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.security.Key;
-import java.util.Date;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String SECRET_KEY;
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-    @Value("${jwt.expiration}")
-    private long EXPIRATION_TIME;
+    private SecretKey secretKey;
+    private final long EXPIRATION_TIME = 3600000L;
 
-    // Generar un token con email y rol
+    public JwtUtil() {
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        logger.info("JwtUtil initialized with HS256 secret key.");
+    }
+
     public String generateToken(String email, String role) {
-        // Generar la clave de firma con SECRET_KEY
-        Key key = new SecretKeySpec(SECRET_KEY.getBytes(), SignatureAlgorithm.HS256.getJcaName());
-
-        // Generar el token
-        return Jwts.builder()
+        logger.info("Generating token for email: {} and role: {}", email, role);
+        String token = Jwts.builder()
                 .setSubject(email)
-                .claim("role", role)
+                .claim("role", "ROLE_" + role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(key)
+                .signWith(secretKey)
                 .compact();
+        logger.info("Token generated successfully for email: {}", email);
+        return token;
     }
 
-    // Validar un token
-    public boolean validateToken(String token, UserDetails userDetails) {
-        String username = extractEmail(token);  // Extraemos el email del token
 
-        // Verificamos si el email del token coincide con el de los detalles del usuario
-        if (username.equals(userDetails.getUsername()) && !isTokenExpired(token)) {
-            return true;  // El token es válido y no está expirado
-        }
-        return false;  // El token es inválido o el usuario no coincide
+    public boolean validateToken(String token, String email) {
+        logger.info("Validating token for email: {}", email);
+        String tokenEmail = extractEmail(token);
+        boolean valid = tokenEmail.equals(email) && !isTokenExpired(token);
+        logger.info("Token validation result for email {}: {}", email, valid);
+        return valid;
     }
 
-    // Extraer el email del token
     public String extractEmail(String token) {
+        logger.debug("Extracting email from token.");
         return extractClaim(token, Claims::getSubject);
     }
 
-    // Extraer el rol del token
     public String extractRole(String token) {
-        return extractClaim(token, claims -> claims.get("role", String.class));
+        logger.debug("Extracting role from token.");
+        String role = extractClaim(token, claims -> claims.get("role", String.class));
+        logger.info("Role extracted from token: {}", role);
+        return role;
     }
 
-    // Extraer cualquier información del token
+
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
+        logger.debug("Claims extracted: {}", claims);
         return claimsResolver.apply(claims);
     }
 
-    // Extraer todos los claims del token
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        logger.debug("Extracting all claims from token.");
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
-    // Método corregido
+
     private boolean isTokenExpired(String token) {
-        Claims claims = extractAllClaims(token);  // Extraemos todos los claims del token
-        Date expirationDate = claims.getExpiration();  // Obtenemos la fecha de expiración
-        return expirationDate.before(new Date());  // Verificamos si la fecha de expiración es anterior a la fecha actual
+        Claims claims = extractAllClaims(token);
+        Date expirationDate = claims.getExpiration();
+        boolean expired = expirationDate.before(new Date());
+        logger.info("Token expiration check: {}", expired);
+        return expired;
     }
-
 }
-

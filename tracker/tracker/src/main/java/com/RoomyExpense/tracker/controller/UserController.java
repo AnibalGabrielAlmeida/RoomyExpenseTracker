@@ -49,7 +49,8 @@ public class UserController {
 
         user.setPhoneNumber(userCreationDTO.getPhoneNumber());
         user.setHouse(houseOptional.get());
-        user.setRole(User.Role.ROOMY); // todos arrancan como roomy y despues se asigna un admin.
+        user.setRole(User.UserRole.valueOf(userCreationDTO.getRole().toUpperCase()));
+
         user.setRegistrationDate(LocalDate.now());
 
         // Guardar usuario
