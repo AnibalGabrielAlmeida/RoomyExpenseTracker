@@ -93,4 +93,15 @@ public class HouseController {
         houseService.deleteHouse(id);
         return ResponseEntity.status(HttpStatus.OK).body("Casa con ID " + id + " eliminada exitosamente.");
     }
+
+    @GetMapping("/{houseId}/roommates")
+    public ResponseEntity<?> getRoommates(@PathVariable Long houseId) {
+        List<User> roommates = houseService.getRoommatesByHouseId(houseId);
+
+        if (roommates.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("No hay usuarios asociados a esta casa.");
+        }
+
+        return ResponseEntity.ok(roommates);
+    }
 }

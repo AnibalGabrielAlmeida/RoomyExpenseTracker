@@ -46,11 +46,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()  // Public routes
                         .requestMatchers("/api/user/saveUser").permitAll()
-                        .requestMatchers("/api/house/saveHouse").permitAll()
-                        .requestMatchers("/api/user/getAll").permitAll()
-                        .requestMatchers("/api/house/getAll").permitAll()
-                        .requestMatchers("/api/house/**").hasRole("ADMIN")  // Only accessible for ADMIN
-                        .requestMatchers("/api/house/delete").hasRole("ADMIN")
+                        .requestMatchers("/api/house/**").permitAll()
+                        .requestMatchers("/api/user/**").permitAll()
+
+                        //.requestMatchers("/api/house/**").hasRole("ADMIN")  // Only accessible for ADMIN
+                       // .requestMatchers("/api/house/delete").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/roomy/**").hasRole("ROOMY")
                         .anyRequest().authenticated()  // Protect other routes

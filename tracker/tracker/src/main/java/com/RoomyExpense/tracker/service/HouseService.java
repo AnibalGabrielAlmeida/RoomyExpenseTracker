@@ -37,4 +37,9 @@ public class HouseService implements IHouseService{
     public void deleteHouse(Long id) {
         houseRepository.deleteById(id);
     }
+
+    @Override
+    public List<User> getRoommatesByHouseId(Long houseId) {
+        return houseRepository.findRoommatesByHouseId(houseId);
+    }
 }
