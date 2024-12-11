@@ -98,6 +98,41 @@ public class HouseController {
         return ResponseEntity.status(HttpStatus.OK).body("Casa con ID " + id + " eliminada exitosamente.");
     }
 
+
+    @PostMapping("/addExistingUser/{houseId}/{userId}")
+    public ResponseEntity<?> addExistingUserToHouse(@PathVariable Long houseId, @PathVariable Long userId) {
+        Optional<House> houseOptional = houseService.getHouseById(houseId);
+
+        if (houseOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa con ID " + houseId + " no encontrada.");
+        }
+
+        Optional<User> userOptional = userService.getUserById(userId);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + userId + " no encontrado.");
+        }
+
+        House house = houseOptional.get();
+        User user = userOptional.get();
+
+        // Verificar si el usuario ya está asignado a una casa
+        if (user.getHouse() != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya está asignado a una casa.");
+        }
+
+        // Establecer la relación bidireccional
+        user.setHouse(house);
+        house.getRoommates().add(user);
+
+        // Guardar cambios
+        userService.saveUser(user);
+        houseService.saveHouse(house);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Usuario agregado exitosamente a la casa.");
+    }
+
+
     @GetMapping("/{houseId}/roommates")
     public ResponseEntity<?> getRoommates(@PathVariable Long houseId) {
         List<User> roommates = houseService.getRoommatesByHouseId(houseId);
