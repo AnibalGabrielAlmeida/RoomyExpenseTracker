@@ -2,6 +2,7 @@ package com.RoomyExpense.tracker.controller;
 
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
+import com.RoomyExpense.tracker.DTO.UserDTO;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
@@ -141,8 +142,23 @@ public class HouseController {
             return ResponseEntity.status(HttpStatus.OK).body("No hay usuarios asociados a esta casa.");
         }
 
-        return ResponseEntity.ok(roommates);
+        // Convertir a DTOs
+        List<UserDTO> roommatesDTOs = roommates.stream()
+                .map(user -> new UserDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getPhoneNumber(),
+                        user.getRegistrationDate(),
+                        user.getHouse() != null ? user.getHouse().getName() : null, // Nombre de la casa
+                        user.getHouse() != null ? "/api/house/" + user.getHouse().getId() : null, // URL de la casa
+                        user.getRole().name()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(roommatesDTOs);
     }
+
 
     @DeleteMapping("/removeUser/{houseId}/{userId}")
     public ResponseEntity<?> removeUserFromHouse(@PathVariable Long houseId, @PathVariable Long userId) {

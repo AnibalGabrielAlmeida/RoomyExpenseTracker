@@ -42,10 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // Ignorar rutas permitidas
         if (requestURI.startsWith("/api/auth/")
-                || requestURI.startsWith("/api/user/saveUser")
-                || requestURI.startsWith("/api/house/saveHouse")
-                || requestURI.startsWith("/api/user/getAll")
-                || requestURI.startsWith("/api/house/getAll")) {
+                || requestURI.startsWith("/api/user/")
+                || requestURI.startsWith("/api/house/")) {
             logger.info("Skipping JWT filter for permitted route: {}", requestURI);
             filterChain.doFilter(request, response);
             return;

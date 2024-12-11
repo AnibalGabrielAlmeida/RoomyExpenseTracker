@@ -2,15 +2,18 @@ package com.RoomyExpense.tracker.controller;
 
 import com.RoomyExpense.tracker.DTO.UserCreationDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
+import com.RoomyExpense.tracker.DTO.UserRoleUpdateDTO;
+import com.RoomyExpense.tracker.DTO.UserUpdateDTO;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
 import com.RoomyExpense.tracker.service.IUserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -28,8 +31,8 @@ public class UserController {
     @Autowired
     private IHouseService houseService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    //@Autowired
+    //private PasswordEncoder passwordEncoder;
 
     @PostMapping("/saveUser")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
@@ -45,8 +48,8 @@ public class UserController {
         user.setName(userCreationDTO.getName());
         user.setEmail(userCreationDTO.getEmail());
        // String encodedPassword = passwordEncoder.encode(user.getPassword()); // Cifra la contraseña
-        user.setPassword(passwordEncoder.encode(userCreationDTO.getPassword()));
-
+        //user.setPassword(passwordEncoder.encode(userCreationDTO.getPassword()));
+        user.setPassword((userCreationDTO.getPassword()));
         user.setPhoneNumber(userCreationDTO.getPhoneNumber());
         user.setHouse(houseOptional.get());
         user.setRole(User.UserRole.valueOf(userCreationDTO.getRole().toUpperCase()));
@@ -131,4 +134,28 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
     }
+
+    @PatchMapping("/{userId}/role")
+    public ResponseEntity<UserDTO> changeUserRole(@PathVariable Long userId, @RequestBody UserRoleUpdateDTO updateRoleDTO) {
+        UserDTO updatedUser = userService.changeUserRole(userId, updateRoleDTO);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
+
+
+   /* @PatchMapping("/{userId}")
+    public User updateUser(@PathVariable Long userId, @RequestBody UserUpdateDTO userUpdateDTO) {
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        // Usar BeanUtils para copiar solo los campos no nulos
+        if (userUpdateDTO.getName() != null) user.setName(userUpdateDTO.getName());
+        if (userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
+        if (userUpdateDTO.getPhoneNumber() != null) user.setPhoneNumber(userUpdateDTO.getPhoneNumber());
+        if (userUpdateDTO.getHouseId() != null) user.setHouseId(userUpdateDTO.getHouseId());
+
+
+        return userService.saveUser(user);
+    }*/
 }
