@@ -50,7 +50,7 @@ public class ExpenseController {
 
         return ResponseEntity.ok(expenseDTOs);
     }
-
+/*
     // Obtener gastos por ID de casa
     @GetMapping("/getByHouse/{houseId}")
     public ResponseEntity<?> getExpensesByHouse(@PathVariable Long houseId) {
@@ -80,8 +80,8 @@ public class ExpenseController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(expenseDTOs);
-    }
-
+    }*/
+/*
     // Crear un nuevo gasto
     @PostMapping("/create")
     public ResponseEntity<?> createExpense(@RequestBody ExpenseDTO expenseDTO) {
@@ -119,5 +119,5 @@ public class ExpenseController {
 
         expenseService.deleteExpense(id);
         return ResponseEntity.ok("Gasto eliminado exitosamente.");
-    }
+    }*/
 }

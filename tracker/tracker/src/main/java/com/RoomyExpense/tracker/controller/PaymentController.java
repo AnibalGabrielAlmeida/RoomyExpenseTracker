@@ -50,6 +50,7 @@ public class PaymentController {
     }
 
     // Crear un pago (básico, solo con monto, usuario y gasto)
+    /*
     @PostMapping
     public ResponseEntity<PaymentDTO> createPayment(@Validated @RequestBody PaymentCreationDTO paymentCreationDTO,
                                                     BindingResult bindingResult) {
@@ -114,5 +115,5 @@ public class PaymentController {
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(debtSummary, HttpStatus.OK);
-    }
+    }*/
 }

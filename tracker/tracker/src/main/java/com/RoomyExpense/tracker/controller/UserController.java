@@ -31,100 +31,45 @@ public class UserController {
     @Autowired
     private IHouseService houseService;
 
-    //@Autowired
-    //private PasswordEncoder passwordEncoder;
-
     @PostMapping("/saveUser")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
-        // Verificar si la casa asociada existe
-        Optional<House> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
-        if (houseOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("La casa con ID " + userCreationDTO.getHouseId() + " no existe.");
+        try {
+            UserDTO userDTO = userService.createUser(userCreationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al crear el usuario.");
         }
-
-        // Mapea DTO a entidad
-        User user = new User();
-        user.setName(userCreationDTO.getName());
-        user.setEmail(userCreationDTO.getEmail());
-       // String encodedPassword = passwordEncoder.encode(user.getPassword()); // Cifra la contraseña
-        //user.setPassword(passwordEncoder.encode(userCreationDTO.getPassword()));
-        user.setPassword((userCreationDTO.getPassword()));
-        user.setPhoneNumber(userCreationDTO.getPhoneNumber());
-        user.setHouse(houseOptional.get());
-        user.setRole(User.UserRole.valueOf(userCreationDTO.getRole().toUpperCase()));
-
-        user.setRegistrationDate(LocalDate.now());
-
-        // Guardar usuario
-        User savedUser = userService.saveUser(user);
-
-        // Mapea entidad a DTO para la respuesta
-        UserDTO userDTO = new UserDTO(
-                savedUser.getId(),
-                savedUser.getName(),
-                savedUser.getEmail(),
-                savedUser.getPhoneNumber(),
-                savedUser.getRegistrationDate(),
-                savedUser.getHouse() != null ? savedUser.getHouse().getName() : null, // Nombre de la casa
-                savedUser.getHouse() != null ? "/api/houses/" + savedUser.getHouse().getId() : null, // URL de la casa
-                savedUser.getRole().name() // Rol como string
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllUsers() {
-        List<User> users = userService.getAllUsers();
+        List<UserDTO> userDTOs = userService.getAllUsers();
 
-        if (users.isEmpty()) {
+        if (userDTOs.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body("No hay usuarios registrados actualmente.");
         }
-
-        List<UserDTO> userDTOs = users.stream()
-                .map(user -> new UserDTO(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getPhoneNumber(),
-                        user.getRegistrationDate(),
-                        user.getHouse() != null ? user.getHouse().getName() : null, // Nombre de la casa
-                        user.getHouse() != null ? "/api/houses/" + user.getHouse().getId() : null, // URL de la casa
-                        user.getRole().name() // Rol como string
-                ))
-                .collect(Collectors.toList());
 
         return ResponseEntity.ok(userDTOs);
     }
 
     @GetMapping("/getById/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        Optional<User> userOptional = userService.getUserById(id);
+        Optional<UserDTO> userDTOOptional = userService.getUserById(id);
 
-        if (userOptional.isEmpty()) {
+        if (userDTOOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Usuario con ID " + id + " no encontrado.");
         }
 
-        User user = userOptional.get();
-        UserDTO userDTO = new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getRegistrationDate(),
-                user.getHouse() != null ? user.getHouse().getName() : null, // Nombre de la casa
-                user.getHouse() != null ? "/api/houses/" + user.getHouse().getId() : null, // URL de la casa
-                user.getRole().name() // Rol como string
-        );
-
-        return ResponseEntity.ok(userDTO);
+        return ResponseEntity.ok(userDTOOptional.get());
     }
+
 
     @DeleteMapping("/deleteById/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
-        Optional<User> userOptional = userService.getUserById(id);
+        Optional<UserDTO> userOptional = userService.getUserById(id);
 
         if (userOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -135,12 +80,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
     }
 
+    /*
     @PatchMapping("/{userId}/role")
     public ResponseEntity<UserDTO> changeUserRole(@PathVariable Long userId, @RequestBody UserRoleUpdateDTO updateRoleDTO) {
         UserDTO updatedUser = userService.changeUserRole(userId, updateRoleDTO);
         return ResponseEntity.ok(updatedUser);
     }
-
+*/
 
 
 

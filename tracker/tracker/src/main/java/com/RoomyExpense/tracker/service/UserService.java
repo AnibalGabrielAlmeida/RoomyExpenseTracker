@@ -1,15 +1,21 @@
 package com.RoomyExpense.tracker.service;
 
-import com.RoomyExpense.tracker.DTO.UserDTO;
-import com.RoomyExpense.tracker.DTO.UserRoleUpdateDTO;
+import com.RoomyExpense.tracker.DTO.*;
+import com.RoomyExpense.tracker.mapper.HouseMapper;
+import com.RoomyExpense.tracker.mapper.UserMapper;
+import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
+import com.RoomyExpense.tracker.repository.HouseRepository;
 import com.RoomyExpense.tracker.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Validated
@@ -18,21 +24,100 @@ public class UserService implements  IUserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private HouseRepository houseRepository;
+
+    @Autowired
+    private IHouseService houseService;
+
+    @Autowired
+    private HouseMapper houseMapper;
+
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.findAll(); // Obtener lista de usuarios
+        return users.stream()
+                .map(userMapper::toUserDTO)
+                .collect(Collectors.toList()); // Convertir a UserDTO
     }
 
     @Override
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public Optional<UserDTO> getUserById(Long id) {
+        Optional<User> userOptional = userRepository.findById(id); // Obtener usuario por ID
+        return userOptional.map(userMapper::toUserDTO); // Convertir a UserDTO si está presente
     }
-    //check optional handling
 
     @Override
-    public Optional<User> getUserById(Long id) {
-        return userRepository.findById(id);
+    public UserDTO createUser(UserCreationDTO userCreationDTO) {
+        try {
+            System.out.println("Creando usuario con datos: " + userCreationDTO);
+
+            // Mapeo de usuario
+            User user = userMapper.toEntity(userCreationDTO);
+            System.out.println("Usuario convertido a entidad: " + user);
+
+            // Obtención de la casa
+            Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
+            if (houseOptional.isEmpty()) {
+                throw new EntityNotFoundException("La casa con ID " + userCreationDTO.getHouseId() + " no existe.");
+            }
+
+            // Verificar si la casa ya existe en la base de datos
+            Optional<House> existingHouse = houseRepository.findById(houseOptional.get().getId());
+            House house;
+            if (existingHouse.isPresent()) {
+                house = existingHouse.get(); // Asociar la existente
+            } else {
+                house = houseMapper.DTOToEntity(houseOptional.get());
+                houseRepository.save(house); // Guardar solo si es necesario
+            }
+            user.setHouse(house);
+
+            System.out.println("Usuario asignado con house: " + user);
+
+            // Guardar usuario en la base de datos
+            User savedUser = userRepository.save(user);
+            System.out.println("Usuario guardado en base de datos: " + savedUser);
+
+            return userMapper.toUserDTO(savedUser);
+        } catch (EntityNotFoundException e) {
+            System.err.println("Excepción: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e) {
+            System.err.println("Error inesperado: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error al crear el usuario.", e);
+        }
     }
+
+
+
+
+
+
+    /*public UserDTO createUser(UserCreationDTO userCreationDTO) {
+        User user = userMapper.toEntity(userCreationDTO);
+        Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
+        if (houseOptional.isEmpty()) {
+            throw new EntityNotFoundException("La casa con ID " + userCreationDTO.getHouseId() + " no existe.");
+        }
+
+        HouseCreationDTO houseCreationDTO = new HouseCreationDTO(
+                houseOptional.get().getName(),
+                houseOptional.get().getAddress()
+        );
+        House house = houseMapper.toEntity(houseCreationDTO);
+
+        user.setHouse(house);
+
+        User savedUser = userRepository.save(user);
+
+        return userMapper.toUserDTO(savedUser);
+    }*/
+
+
 
     @Override
     public void deleteUser(Long id) {

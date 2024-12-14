@@ -27,79 +27,52 @@ public class HouseController {
     @Autowired
     IUserService userService;
 
+
     @PostMapping("/saveHouse")
-    public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
-        // Mapea DTO a entidad
-        House house = new House();
-        house.setName(houseCreationDTO.getName());
-        house.setAddress(houseCreationDTO.getAddress());
-
-        // Save in DB
-        House savedHouse = houseService.saveHouse(house);
-
-        // Mapea entidad a DTO para la respuesta
-        HouseDTO houseDTO = new HouseDTO(savedHouse.getId(), savedHouse.getName(), savedHouse.getAddress(), List.of());
-        return ResponseEntity.ok(houseDTO);
-    }
+public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
+    HouseDTO houseDTO = houseService.createHouse(houseCreationDTO);
+    return ResponseEntity.ok(houseDTO);
+}
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllHouses() {
-        List<House> houses = houseService.getAllHouses();
+        List<HouseDTO> houseDTOs = houseService.getAllHouses();
 
-        if (houses.isEmpty()) {
+        if (houseDTOs.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body("No hay casas registradas actualmente.");
         }
-
-        List<HouseDTO> houseDTOs = houses.stream()
-                .map(house -> new HouseDTO(
-                        house.getId(),
-                        house.getName(),
-                        house.getAddress(),
-                        house.getRoommates().stream()
-                                .map(User::getName)
-                                .collect(Collectors.toList())
-                ))
-                .collect(Collectors.toList());
 
         return ResponseEntity.ok(houseDTOs);
     }
 
-
     @GetMapping("/getById/{id}")
     public ResponseEntity<?> getHouseById(@PathVariable Long id) {
-        Optional<House> houseOptional = houseService.getHouseById(id);
+        Optional<HouseDTO> houseDTO = houseService.getHouseById(id);
 
-        if (houseOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa con ID " + id + " no encontrada.");
+        if (houseDTO.isPresent()) {
+            return ResponseEntity.ok(houseDTO.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Casa con ID " + id + " no encontrada.");
         }
-
-        House house = houseOptional.get();
-        HouseDTO houseDTO = new HouseDTO(
-                house.getId(),
-                house.getName(),
-                house.getAddress(),
-                house.getRoommates().stream()
-                        .map(User::getName)
-                        .collect(Collectors.toList())
-        );
-
-        return ResponseEntity.ok(houseDTO);
     }
+
+
+
+
 
 
     @DeleteMapping("/deleteById/{id}")
     public ResponseEntity<?> deleteHouseById(@PathVariable Long id) {
-        Optional<House> houseOptional = houseService.getHouseById(id);
-
-        if (houseOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa con ID " + id + " no encontrada.");
-        }
-
-        houseService.deleteHouse(id);
-        return ResponseEntity.status(HttpStatus.OK).body("Casa con ID " + id + " eliminada exitosamente.");
+        return houseService.getHouseById(id)
+                .map(houseDTO -> {
+                    houseService.deleteHouse(id);
+                    return ResponseEntity.status(HttpStatus.OK).body("Casa con ID " + id + " eliminada exitosamente.");
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa con ID " + id + " no encontrada."));
     }
 
-
+/*
     @PostMapping("/addExistingUser/{houseId}/{userId}")
     public ResponseEntity<?> addExistingUserToHouse(@PathVariable Long houseId, @PathVariable Long userId) {
         Optional<House> houseOptional = houseService.getHouseById(houseId);
@@ -132,7 +105,7 @@ public class HouseController {
 
         return ResponseEntity.status(HttpStatus.OK).body("Usuario agregado exitosamente a la casa.");
     }
-
+*/
 
     @GetMapping("/{houseId}/roommates")
     public ResponseEntity<?> getRoommates(@PathVariable Long houseId) {
@@ -158,7 +131,7 @@ public class HouseController {
 
         return ResponseEntity.ok(roommatesDTOs);
     }
-
+/*
 
     @DeleteMapping("/removeUser/{houseId}/{userId}")
     public ResponseEntity<?> removeUserFromHouse(@PathVariable Long houseId, @PathVariable Long userId) {
@@ -193,6 +166,6 @@ public class HouseController {
 
         return ResponseEntity.status(HttpStatus.OK).body("Usuario eliminado exitosamente de la casa.");
     }
-
+*/
 
 }
