@@ -31,7 +31,7 @@ public class UserController {
     @Autowired
     private IHouseService houseService;
 
-    @PostMapping("/saveUser")
+    @PostMapping("/createUser")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserCreationDTO userCreationDTO) {
         try {
             UserDTO userDTO = userService.createUser(userCreationDTO);

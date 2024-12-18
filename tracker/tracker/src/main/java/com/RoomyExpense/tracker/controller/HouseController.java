@@ -28,7 +28,7 @@ public class HouseController {
     IUserService userService;
 
 
-    @PostMapping("/saveHouse")
+    @PostMapping("/createHouse")
 public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
     HouseDTO houseDTO = houseService.createHouse(houseCreationDTO);
     return ResponseEntity.ok(houseDTO);
