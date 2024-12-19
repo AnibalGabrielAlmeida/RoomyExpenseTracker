@@ -29,9 +29,9 @@ public class HouseController {
 
 
     @PostMapping("/createHouse")
-public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
-    HouseDTO houseDTO = houseService.createHouse(houseCreationDTO);
-    return ResponseEntity.ok(houseDTO);
+    public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
+        HouseDTO houseDTO = houseService.createHouse(houseCreationDTO);
+        return ResponseEntity.ok(houseDTO);
 }
 
     @GetMapping("/getAll")
@@ -57,20 +57,16 @@ public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO
         }
     }
 
-
-
-
-
-
     @DeleteMapping("/deleteById/{id}")
-    public ResponseEntity<?> deleteHouseById(@PathVariable Long id) {
-        return houseService.getHouseById(id)
-                .map(houseDTO -> {
-                    houseService.deleteHouse(id);
-                    return ResponseEntity.status(HttpStatus.OK).body("Casa con ID " + id + " eliminada exitosamente.");
+    public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
+        return userService.getUserById(id)
+                .map(userDTO -> {
+                    userService.deleteUser(id);
+                    return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
                 })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa con ID " + id + " no encontrada."));
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + id + " no encontrado."));
     }
+
 
 /*
     @PostMapping("/addExistingUser/{houseId}/{userId}")

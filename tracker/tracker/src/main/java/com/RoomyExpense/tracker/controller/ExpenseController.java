@@ -49,7 +49,31 @@ public class ExpenseController {
                     .body("Gasto con ID " + id + " no encontrado.");
         }
     }
-/*
+
+    @PostMapping("/createExpense")
+    public ResponseEntity<?> createExpense(@RequestBody ExpenseCreationDTO expenseCreationDTO) {
+        try {
+            Expense expense = expenseService.createExpense(expenseCreationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Gasto creado exitosamente. Casa: " + expense.getHouse().getName());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el gasto.");
+        }
+    }
+
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<?> deleteExpenseById(@PathVariable Long id) {
+        return expenseService.getExpenseById(id)
+                .map(userDTO -> {
+                    expenseService.deleteExpense(id);
+                    return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + id + " no encontrado."));
+    }
+
+    /*
     // Obtener gastos por ID de casa
     @GetMapping("/getByHouse/{houseId}")
     public ResponseEntity<?> getExpensesByHouse(@PathVariable Long houseId) {
@@ -81,26 +105,4 @@ public class ExpenseController {
         return ResponseEntity.ok(expenseDTOs);
     }*/
 
-    @PostMapping("/createExpense")
-    public ResponseEntity<?> createExpense(@RequestBody ExpenseCreationDTO expenseCreationDTO) {
-        try {
-            Expense expense = expenseService.createExpense(expenseCreationDTO);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Gasto creado exitosamente. Casa: " + expense.getHouse().getName());
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el gasto.");
-        }
-    }
-
-    @DeleteMapping("/deleteById/{id}")
-    public ResponseEntity<?> deleteExpenseById(@PathVariable Long id) {
-        return expenseService.getExpenseById(id)
-                .map(userDTO -> {
-                    expenseService.deleteExpense(id);
-                    return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
-                })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + id + " no encontrado."));
-    }
 }

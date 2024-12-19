@@ -30,7 +30,6 @@ public class HouseMapper {
         }
 
 
-
     public HouseDTO toDTOWithRoommates(House house) {
         return new HouseDTO(
                 house.getId(),

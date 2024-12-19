@@ -43,7 +43,6 @@ public class ExpenseService implements IExpenseService {
     }
 
 
-    //check optional handling
     @Override
     public Optional<ExpenseDTO> getExpenseById(Long id){
         Optional<Expense> expenseOptional = expenseRepository.findById(id); // Obtener usuario por ID

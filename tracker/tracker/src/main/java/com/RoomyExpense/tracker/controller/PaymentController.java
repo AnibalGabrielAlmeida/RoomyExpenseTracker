@@ -8,6 +8,7 @@ import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.ExpenseService;
 import com.RoomyExpense.tracker.service.PaymentService;
 import com.RoomyExpense.tracker.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,88 +33,46 @@ public class PaymentController {
     @Autowired
     private ExpenseService expenseService;
 
-    // Obtener todos los pagos (historial de pagos)
-    @GetMapping
-    public ResponseEntity<List<PaymentDTO>> getAllPayments() {
-        List<PaymentDTO> paymentDTOs = paymentService.getAllPayments().stream()
-                .map(payment -> new PaymentDTO(
-                        payment.getId(),
-                        payment.getPaymentDate(),
-                        payment.getAmount(),
-                        payment.getState().toString(),
-                        payment.getUser().getName(),
-                        payment.getExpense().getName()
-                ))
-                .collect(Collectors.toList());
 
-        return new ResponseEntity<>(paymentDTOs, HttpStatus.OK);
+    @GetMapping("/getAll")
+    public ResponseEntity<?> getAllPayments() {
+        List<PaymentDTO> paymentDTOs = paymentService.getAllPayments();
+        if(paymentDTOs.isEmpty()){
+            return ResponseEntity.status(HttpStatus.OK).body("No hay pagos registrados actualmente.");
+        }
+        return ResponseEntity.ok(paymentDTOs);
     }
 
-    // Crear un pago (básico, solo con monto, usuario y gasto)
-    /*
-    @PostMapping
-    public ResponseEntity<PaymentDTO> createPayment(@Validated @RequestBody PaymentCreationDTO paymentCreationDTO,
-                                                    BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<?> getPaymentById(@PathVariable Long id){
+        Optional<PaymentDTO> paymentDTO = paymentService.getPaymentById(id);
+        if(paymentDTO.isEmpty()){
+            return ResponseEntity.status(HttpStatus.OK).body("Pago no encontrado");
         }
-
-        // Buscar el usuario y gasto en la base de datos
-        Optional<User> user = userService.getUserById(paymentCreationDTO.getUserId());
-        Optional<Expense> expense = expenseService.getExpenseById(paymentCreationDTO.getExpenseId());
-
-        if (user.isEmpty() || expense.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Payment payment = new Payment();
-        payment.setPaymentDate(java.time.LocalDate.now()); // Asignamos la fecha actual
-        payment.setAmount(paymentCreationDTO.getAmount());
-        payment.setUser(user.get()); // Asignamos el usuario encontrado
-        payment.setExpense(expense.get()); // Asignamos el gasto encontrado
-        payment.setState(Payment.State.UNPAID); // Por defecto se pone como UNPAID
-
-        Payment savedPayment = paymentService.savePayment(payment);
-
-        PaymentDTO paymentDTO = new PaymentDTO(
-                savedPayment.getId(),
-                savedPayment.getPaymentDate(),
-                savedPayment.getAmount(),
-                savedPayment.getState().toString(),
-                savedPayment.getUser().getName(),
-                savedPayment.getExpense().getName()
-        );
-
-        return new ResponseEntity<>(paymentDTO, HttpStatus.CREATED);
+        return ResponseEntity.ok(paymentDTO.get());
     }
 
-    // Eliminar un pago por ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
-        Optional<Payment> payment = paymentService.getPaymentById(id);
-        if (payment.isPresent()) {
-            paymentService.deletePayment(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PostMapping("/createPayment")
+    public ResponseEntity<?> createPayment(@RequestBody PaymentCreationDTO paymentCreationDTO){
+        try {
+            Payment payment = paymentService.createPayment(paymentCreationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Pago creado exitosamente. Usuario: " + payment.getUser().getName()
+                    + "\nGasto: " + payment.getExpense().getName() );
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el pago.");
         }
     }
 
-    // Obtener el total de deudas (pagos no realizados)
-    @GetMapping("/deudas")
-    public ResponseEntity<List<PaymentDTO>> getDebtSummary() {
-        List<PaymentDTO> debtSummary = paymentService.getAllPayments().stream()
-                .filter(payment -> payment.getState() == Payment.State.UNPAID)
-                .map(payment -> new PaymentDTO(
-                        payment.getId(),
-                        payment.getPaymentDate(),
-                        payment.getAmount(),
-                        payment.getState().toString(),
-                        payment.getUser().getName(),
-                        payment.getExpense().getName()
-                ))
-                .collect(Collectors.toList());
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<?> deletePayment(@PathVariable Long id){
+        return paymentService.getPaymentById(id)
+                .map(paymentDTO -> {
+                    paymentService.deletePayment(id);
+                    return ResponseEntity.status(HttpStatus.OK).body("Pago con Id: " + id + " eliminado exitosamente");
+                }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pago con Id: " + id + " no encontrado"));
+    }
 
-        return new ResponseEntity<>(debtSummary, HttpStatus.OK);
-    }*/
 }
