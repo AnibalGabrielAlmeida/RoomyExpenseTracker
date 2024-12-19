@@ -2,7 +2,9 @@ package com.RoomyExpense.tracker.service;
 
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
+import com.RoomyExpense.tracker.DTO.UserDTO;
 import com.RoomyExpense.tracker.mapper.HouseMapper;
+import com.RoomyExpense.tracker.mapper.UserMapper;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.repository.HouseRepository;
@@ -19,10 +21,10 @@ public class    HouseService implements IHouseService{
 
     @Autowired
     private HouseRepository houseRepository;
-
     @Autowired
     private HouseMapper houseMapper;
-
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public List<HouseDTO> getAllHouses() {
@@ -38,8 +40,6 @@ public class    HouseService implements IHouseService{
                 .map(houseMapper::toDTOWithRoommates);
     }
 
-
-
     @Override
     public HouseDTO createHouse(HouseCreationDTO houseCreationDTO) {
         House house = houseMapper.toEntity(houseCreationDTO);
@@ -47,15 +47,17 @@ public class    HouseService implements IHouseService{
         return houseMapper.toDTO(savedHouse);
     }
 
-
-
     @Override
     public void deleteHouse(Long id) {
         houseRepository.deleteById(id);
     }
-
     @Override
-    public List<User> getRoommatesByHouseId(Long houseId) {
-        return houseRepository.findRoommatesByHouseId(houseId);
+    public List<UserDTO> getRoommatesByHouseId(Long houseId) {
+        List<User> roommates = houseRepository.findRoommatesByHouseId(houseId);
+        return   roommates.stream()
+                .map(userMapper::toUserDTO)
+                .collect(Collectors.toList());
+
+
     }
 }

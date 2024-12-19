@@ -2,6 +2,7 @@ package com.RoomyExpense.tracker.service;
 
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
+import com.RoomyExpense.tracker.DTO.UserDTO;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 
@@ -13,5 +14,5 @@ public interface IHouseService {
     Optional<HouseDTO> getHouseById(Long id);
     void deleteHouse(Long id);
     HouseDTO createHouse(HouseCreationDTO houseCreationDTO);
-    List<User> getRoommatesByHouseId(Long houseId);
+    List<UserDTO> getRoommatesByHouseId(Long houseId);
 }

@@ -3,6 +3,7 @@ package com.RoomyExpense.tracker.controller;
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
+import com.RoomyExpense.tracker.mapper.UserMapper;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
@@ -22,10 +23,9 @@ import java.util.stream.Collectors;
 public class HouseController {
 
     @Autowired
-    IHouseService houseService;
-
+    private IHouseService houseService;
     @Autowired
-    IUserService userService;
+    private IUserService userService;
 
 
     @PostMapping("/createHouse")
@@ -68,6 +68,14 @@ public class HouseController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("House with ID " + id + " not found."));
     }
 
+    @GetMapping("/{houseId}/roommates")
+    public ResponseEntity<?> getRoommates(@PathVariable Long houseId) {
+        List<UserDTO> roommatesDTOs = houseService.getRoommatesByHouseId(houseId);
+        if (roommatesDTOs.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("There are no users associated to this house.");
+        }
+        return ResponseEntity.ok(roommatesDTOs);
+    }
 
 /*
     @PostMapping("/addExistingUser/{houseId}/{userId}")
@@ -104,30 +112,7 @@ public class HouseController {
     }
 */
 
-    @GetMapping("/{houseId}/roommates")
-    public ResponseEntity<?> getRoommates(@PathVariable Long houseId) {
-        List<User> roommates = houseService.getRoommatesByHouseId(houseId);
 
-        if (roommates.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body("No hay usuarios asociados a esta casa.");
-        }
-
-        // Convertir a DTOs
-        List<UserDTO> roommatesDTOs = roommates.stream()
-                .map(user -> new UserDTO(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getPhoneNumber(),
-                        user.getRegistrationDate(),
-                        user.getHouse() != null ? user.getHouse().getName() : null, // Nombre de la casa
-                        user.getHouse() != null ? "/api/house/" + user.getHouse().getId() : null, // URL de la casa
-                        user.getRole().name()
-                ))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(roommatesDTOs);
-    }
 /*
 
     @DeleteMapping("/removeUser/{houseId}/{userId}")
