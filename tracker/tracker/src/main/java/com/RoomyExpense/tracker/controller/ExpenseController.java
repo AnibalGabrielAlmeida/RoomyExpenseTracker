@@ -1,9 +1,7 @@
 package com.RoomyExpense.tracker.controller;
 
 import com.RoomyExpense.tracker.DTO.ExpenseCreationDTO;
-import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.model.Expense;
-import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.service.IExpenseService;
 import com.RoomyExpense.tracker.DTO.ExpenseDTO;
 import com.RoomyExpense.tracker.service.IHouseService;
@@ -14,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -27,12 +24,25 @@ public class ExpenseController {
     @Autowired
     private IHouseService houseService;
 
+    @PostMapping("/createExpense")
+    public ResponseEntity<?> createExpense(@RequestBody ExpenseCreationDTO expenseCreationDTO) {
+        try {
+            Expense expense = expenseService.createExpense(expenseCreationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Expense succesfully created. House: " + expense.getHouse().getName());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while creating  the expense.");
+        }
+    }
+
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllExpenses() {
         List<ExpenseDTO> expenseDTOs = expenseService.getAllExpenses();
 
         if (expenseDTOs.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body("No hay gastos registrados actualmente.");
+            return ResponseEntity.status(HttpStatus.OK).body("There are no expenses currently registered.");
         }
 
         return ResponseEntity.ok(expenseDTOs);
@@ -46,20 +56,7 @@ public class ExpenseController {
             return ResponseEntity.ok(expenseDTO.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Gasto con ID " + id + " no encontrado.");
-        }
-    }
-
-    @PostMapping("/createExpense")
-    public ResponseEntity<?> createExpense(@RequestBody ExpenseCreationDTO expenseCreationDTO) {
-        try {
-            Expense expense = expenseService.createExpense(expenseCreationDTO);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Gasto creado exitosamente. Casa: " + expense.getHouse().getName());
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el gasto.");
+                    .body("Expense with ID " + id + " not found.");
         }
     }
 
@@ -68,9 +65,9 @@ public class ExpenseController {
         return expenseService.getExpenseById(id)
                 .map(userDTO -> {
                     expenseService.deleteExpense(id);
-                    return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
+                    return ResponseEntity.status(HttpStatus.OK).body("Expense with ID " + id + " succesfully deleted.");
                 })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + id + " no encontrado."));
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense with ID " + id + " not found."));
     }
 
     /*

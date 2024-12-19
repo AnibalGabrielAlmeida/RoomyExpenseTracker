@@ -30,41 +30,38 @@ public class HouseController {
 
     @PostMapping("/createHouse")
     public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
-        HouseDTO houseDTO = houseService.createHouse(houseCreationDTO);
+        HouseDTO houseDTO = houseService.createHouse(houseCreationDTO);//todo chequea el expense controller y copia el formato.
         return ResponseEntity.ok(houseDTO);
 }
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllHouses() {
         List<HouseDTO> houseDTOs = houseService.getAllHouses();
-
         if (houseDTOs.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body("No hay casas registradas actualmente.");
+            return ResponseEntity.status(HttpStatus.OK).body("There are no houses currently registered.");
         }
-
         return ResponseEntity.ok(houseDTOs);
     }
 
     @GetMapping("/getById/{id}")
     public ResponseEntity<?> getHouseById(@PathVariable Long id) {
         Optional<HouseDTO> houseDTO = houseService.getHouseById(id);
-
         if (houseDTO.isPresent()) {
             return ResponseEntity.ok(houseDTO.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Casa con ID " + id + " no encontrada.");
+                    .body("House with ID " + id + " not found.");
         }
     }
 
     @DeleteMapping("/deleteById/{id}")
-    public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
-        return userService.getUserById(id)
+    public ResponseEntity<?> deleteHouseById(@PathVariable Long id) {
+        return houseService.getHouseById(id)
                 .map(userDTO -> {
-                    userService.deleteUser(id);
-                    return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
+                    houseService.deleteHouse(id);
+                    return ResponseEntity.status(HttpStatus.OK).body("House with ID " + id + " succesfully deleted.");
                 })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + id + " no encontrado."));
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("House with ID " + id + " not found."));
     }
 
 

@@ -33,6 +33,19 @@ public class PaymentController {
     @Autowired
     private ExpenseService expenseService;
 
+    @PostMapping("/createPayment")
+    public ResponseEntity<?> createPayment(@RequestBody PaymentCreationDTO paymentCreationDTO){
+        try {
+            Payment payment = paymentService.createPayment(paymentCreationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Pago creado exitosamente. Usuario: " + payment.getUser().getName()
+                            + "\nGasto: " + payment.getExpense().getName() );
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el pago.");
+        }
+    }
 
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllPayments() {
@@ -50,20 +63,6 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.OK).body("Pago no encontrado");
         }
         return ResponseEntity.ok(paymentDTO.get());
-    }
-
-    @PostMapping("/createPayment")
-    public ResponseEntity<?> createPayment(@RequestBody PaymentCreationDTO paymentCreationDTO){
-        try {
-            Payment payment = paymentService.createPayment(paymentCreationDTO);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Pago creado exitosamente. Usuario: " + payment.getUser().getName()
-                    + "\nGasto: " + payment.getExpense().getName() );
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el pago.");
-        }
     }
 
     @DeleteMapping("/deleteById/{id}")

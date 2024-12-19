@@ -50,7 +50,8 @@ public class PaymentService implements IPaymentService {
                 .map(paymentMapper::toDTO)
                 .collect(Collectors.toList());
     }
-    //check optional handling
+
+    @Override
     public Optional<PaymentDTO> getPaymentById(Long id){
         Optional<Payment> paymentOptional = paymentRepository.findById(id);
         return paymentOptional.map(paymentMapper::toDTO);
