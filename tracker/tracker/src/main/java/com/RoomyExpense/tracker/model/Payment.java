@@ -22,13 +22,6 @@ public class Payment {
     private LocalDate paymentDate;
     private Double amount;
 
-    public enum State {
-        PAID, UNPAID
-    }
-    @Enumerated(EnumType.STRING)
-    private State state;
-
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonBackReference
