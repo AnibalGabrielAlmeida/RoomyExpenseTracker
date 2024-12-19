@@ -39,7 +39,7 @@ public class UserController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al crear el usuario.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while creating User.");
         }
     }
 
@@ -48,7 +48,7 @@ public class UserController {
         List<UserDTO> userDTOs = userService.getAllUsers();
 
         if (userDTOs.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body("No hay usuarios registrados actualmente.");
+            return ResponseEntity.status(HttpStatus.OK).body("There are no Users currently registered.");
         }
 
         return ResponseEntity.ok(userDTOs);
@@ -60,7 +60,7 @@ public class UserController {
 
         if (userDTOOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Usuario con ID " + id + " no encontrado.");
+                    .body("User with ID " + id + " not found.");
         }
 
         return ResponseEntity.ok(userDTOOptional.get());
@@ -69,15 +69,12 @@ public class UserController {
 
     @DeleteMapping("/deleteById/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
-        Optional<UserDTO> userOptional = userService.getUserById(id);
-
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Usuario con ID " + id + " no encontrado.");
-        }
-
-        userService.deleteUser(id);
-        return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
+        return userService.getUserById(id)
+                .map(userDTO -> {
+                    userService.deleteUser(id);
+                    return ResponseEntity.status(HttpStatus.OK).body("User with ID " + id + " successfully deleted.");
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + id + " not found."));
     }
 
     /*

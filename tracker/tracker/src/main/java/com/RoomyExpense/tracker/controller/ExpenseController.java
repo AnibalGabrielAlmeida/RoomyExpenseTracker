@@ -29,7 +29,7 @@ public class ExpenseController {
         try {
             Expense expense = expenseService.createExpense(expenseCreationDTO);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Expense succesfully created. House: " + expense.getHouse().getName());
+                    .body("Expense successfully created. House: " + expense.getHouse().getName());
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
@@ -63,9 +63,9 @@ public class ExpenseController {
     @DeleteMapping("/deleteById/{id}")
     public ResponseEntity<?> deleteExpenseById(@PathVariable Long id) {
         return expenseService.getExpenseById(id)
-                .map(userDTO -> {
+                .map(expenseDTO -> {
                     expenseService.deleteExpense(id);
-                    return ResponseEntity.status(HttpStatus.OK).body("Expense with ID " + id + " succesfully deleted.");
+                    return ResponseEntity.status(HttpStatus.OK).body("Expense with ID " + id + " successfully deleted.");
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense with ID " + id + " not found."));
     }

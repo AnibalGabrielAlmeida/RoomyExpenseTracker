@@ -52,45 +52,28 @@ public class UserService implements  IUserService {
 
     @Override
     public UserDTO createUser(UserCreationDTO userCreationDTO) {
-        try {
-            System.out.println("Creando usuario con datos: " + userCreationDTO);
+        System.out.println("Creando usuario con datos: " + userCreationDTO);
 
-            // Mapeo de usuario
-            User user = userMapper.toEntity(userCreationDTO);
-            System.out.println("Usuario convertido a entidad: " + user);
+        // Mapeo de usuario
+        User user = userMapper.toEntity(userCreationDTO);
+        System.out.println("Usuario convertido a entidad: " + user);
 
-            // Obtención de la casa
-            Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
-            if (houseOptional.isEmpty()) {
-                throw new EntityNotFoundException("La casa con ID " + userCreationDTO.getHouseId() + " no existe.");
-            }
+        // Intentar asociar la casa
+        Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
+        houseOptional.ifPresent(houseDTO -> {
+            Optional<House> existingHouse = houseRepository.findById(houseDTO.getId());
+            existingHouse.ifPresent(user::setHouse);
+            System.out.println("Casa asociada al usuario: " + existingHouse.orElse(null));
+        });
 
-            // Verificar si la casa ya existe en la base de datos
-            Optional<House> existingHouse = houseRepository.findById(houseOptional.get().getId());
-            House house;
-            if (existingHouse.isPresent()) {
-                house = existingHouse.get(); // Asociar la existente
-            } else {
-                house = houseMapper.DTOToEntity(houseOptional.get());
-                houseRepository.save(house); // Guardar solo si es necesario
-            }
-            user.setHouse(house);
 
-            System.out.println("Usuario asignado con house: " + user);
+        // Guardar usuario en la base de datos
+        User savedUser = userRepository.save(user);
+        System.out.println("Usuario guardado en base de datos: " + savedUser);
 
-            // Guardar usuario en la base de datos
-            User savedUser = userRepository.save(user);
-            System.out.println("Usuario guardado en base de datos: " + savedUser);
-
-            return userMapper.toUserDTO(savedUser);
-        } catch (EntityNotFoundException e) {
-            System.err.println("Excepción: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
-        } catch (Exception e) {
-            System.err.println("Error inesperado: " + e.getMessage());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error al crear el usuario.", e);
-        }
+        return userMapper.toUserDTO(savedUser);
     }
+
 
     @Override
     public void deleteUser(Long id) {

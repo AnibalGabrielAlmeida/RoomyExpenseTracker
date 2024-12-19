@@ -29,11 +29,15 @@ public class HouseController {
 
 
     @PostMapping("/createHouse")
-    public ResponseEntity<HouseDTO> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
-        HouseDTO houseDTO = houseService.createHouse(houseCreationDTO);//todo chequea el expense controller y copia el formato.
-        return ResponseEntity.ok(houseDTO);
-}
+    public ResponseEntity<?> createHouse(@RequestBody @Valid HouseCreationDTO houseCreationDTO) {
+        try {
+            HouseDTO houseDTO = houseService.createHouse(houseCreationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(houseDTO);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while creating the house");
+        }
 
+    }
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllHouses() {
         List<HouseDTO> houseDTOs = houseService.getAllHouses();
@@ -57,9 +61,9 @@ public class HouseController {
     @DeleteMapping("/deleteById/{id}")
     public ResponseEntity<?> deleteHouseById(@PathVariable Long id) {
         return houseService.getHouseById(id)
-                .map(userDTO -> {
+                .map(houseDTO -> {
                     houseService.deleteHouse(id);
-                    return ResponseEntity.status(HttpStatus.OK).body("House with ID " + id + " succesfully deleted.");
+                    return ResponseEntity.status(HttpStatus.OK).body("House with ID " + id + " successfully deleted.");
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("House with ID " + id + " not found."));
     }

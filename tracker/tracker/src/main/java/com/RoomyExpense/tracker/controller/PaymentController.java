@@ -38,12 +38,12 @@ public class PaymentController {
         try {
             Payment payment = paymentService.createPayment(paymentCreationDTO);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Pago creado exitosamente. Usuario: " + payment.getUser().getName()
-                            + "\nGasto: " + payment.getExpense().getName() );
+                    .body("Payment successfully created. User: " + payment.getUser().getName()
+                            + "\nExpense: " + payment.getExpense().getName() );
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el pago.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error while creating the payment.");
         }
     }
 
@@ -51,7 +51,7 @@ public class PaymentController {
     public ResponseEntity<?> getAllPayments() {
         List<PaymentDTO> paymentDTOs = paymentService.getAllPayments();
         if(paymentDTOs.isEmpty()){
-            return ResponseEntity.status(HttpStatus.OK).body("No hay pagos registrados actualmente.");
+            return ResponseEntity.status(HttpStatus.OK).body("There are no payments currently registered.");
         }
         return ResponseEntity.ok(paymentDTOs);
     }
@@ -60,7 +60,7 @@ public class PaymentController {
     public ResponseEntity<?> getPaymentById(@PathVariable Long id){
         Optional<PaymentDTO> paymentDTO = paymentService.getPaymentById(id);
         if(paymentDTO.isEmpty()){
-            return ResponseEntity.status(HttpStatus.OK).body("Pago no encontrado");
+            return ResponseEntity.status(HttpStatus.OK).body("Payment not found");
         }
         return ResponseEntity.ok(paymentDTO.get());
     }
@@ -70,8 +70,8 @@ public class PaymentController {
         return paymentService.getPaymentById(id)
                 .map(paymentDTO -> {
                     paymentService.deletePayment(id);
-                    return ResponseEntity.status(HttpStatus.OK).body("Pago con Id: " + id + " eliminado exitosamente");
-                }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pago con Id: " + id + " no encontrado"));
+                    return ResponseEntity.status(HttpStatus.OK).body("Payment with Id: " + id + " Succesfully eliminated");
+                }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payment with Id: " + id + " not found"));
     }
 
 }
