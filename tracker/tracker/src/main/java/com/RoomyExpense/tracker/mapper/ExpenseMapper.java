@@ -1,6 +1,7 @@
 package com.RoomyExpense.tracker.mapper;
 
 import com.RoomyExpense.tracker.DTO.ExpenseCreationDTO;
+import com.RoomyExpense.tracker.DTO.ExpenseDTO;
 import com.RoomyExpense.tracker.model.Expense;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,19 @@ public class ExpenseMapper {
         expense.setDate(expenseCreationDTO.getDate());
 
         return expense;
+    }
+
+    public ExpenseDTO toDTO (Expense expense){
+        return new ExpenseDTO(
+                expense.getId(),
+                expense.getName(),
+                expense.getDescription(),
+                expense.getAmount(),
+                expense.getCategory().name(),
+                expense.getDate(),
+                expense.getHouse().getName(),
+                expense.getHouse().getId()
+        );
     }
 
 }

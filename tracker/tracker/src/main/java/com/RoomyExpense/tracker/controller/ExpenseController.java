@@ -1,20 +1,22 @@
 package com.RoomyExpense.tracker.controller;
 
+import com.RoomyExpense.tracker.DTO.ExpenseCreationDTO;
+import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.service.IExpenseService;
 import com.RoomyExpense.tracker.DTO.ExpenseDTO;
 import com.RoomyExpense.tracker.service.IHouseService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-// ExpenseController.java
+
 @RestController
 @RequestMapping("/api/expenses")
 public class ExpenseController {
@@ -25,30 +27,27 @@ public class ExpenseController {
     @Autowired
     private IHouseService houseService;
 
-    // Obtener todos los gastos
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllExpenses() {
-        List<Expense> expenses = expenseService.getAllExpenses();
+        List<ExpenseDTO> expenseDTOs = expenseService.getAllExpenses();
 
-        if (expenses.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body("No hay gastos registrados.");
+        if (expenseDTOs.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("No hay gastos registrados actualmente.");
         }
 
-        // Mapeo de Expense a ExpenseDTO
-        List<ExpenseDTO> expenseDTOs = expenses.stream()
-                .map(expense -> new ExpenseDTO(
-                        expense.getId(),
-                        expense.getName(),
-                        expense.getDescription(),
-                        expense.getAmount(),
-                        expense.getCategory().toString(),
-                        expense.getDate(),
-                        expense.getHouse() != null ? expense.getHouse().getName() : null,
-                        expense.getHouse() != null ? expense.getHouse().getId() : null// Nombre de la casa
-                ))
-                .collect(Collectors.toList());
-
         return ResponseEntity.ok(expenseDTOs);
+    }
+
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<?> getExpenseById(@PathVariable Long id) {
+        Optional<ExpenseDTO> expenseDTO = expenseService.getExpenseById(id);
+
+        if (expenseDTO.isPresent()) {
+            return ResponseEntity.ok(expenseDTO.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Gasto con ID " + id + " no encontrado.");
+        }
     }
 /*
     // Obtener gastos por ID de casa
@@ -81,43 +80,27 @@ public class ExpenseController {
 
         return ResponseEntity.ok(expenseDTOs);
     }*/
-/*
-    // Crear un nuevo gasto
-    @PostMapping("/create")
-    public ResponseEntity<?> createExpense(@RequestBody ExpenseDTO expenseDTO) {
-        // Buscar la casa por ID
-        Optional<House> house = houseService.getHouseById(expenseDTO.getHouseId());
 
-        if (!house.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa no encontrada.");
+    @PostMapping("/createExpense")
+    public ResponseEntity<?> createExpense(@RequestBody ExpenseCreationDTO expenseCreationDTO) {
+        try {
+            Expense expense = expenseService.createExpense(expenseCreationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Gasto creado exitosamente. Casa: " + expense.getHouse().getName());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el gasto.");
         }
-
-        // Crear el gasto
-        Expense expense = new Expense();
-        expense.setName(expenseDTO.getName());
-        expense.setDescription(expenseDTO.getDescription());
-        expense.setAmount(expenseDTO.getAmount());
-        expense.setCategory(Expense.Category.valueOf(expenseDTO.getCategory()));
-        expense.setDate(expenseDTO.getDate());
-        expense.setHouse(house.get()); // Asignar la casa encontrada
-
-        // Guardar el gasto
-        expenseService.saveExpense(expense);
-
-        // Devolver el nombre de la casa
-        return ResponseEntity.status(HttpStatus.CREATED).body("Gasto creado exitosamente. Casa: " + house.get().getName());
     }
 
-    // Eliminar un gasto
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteExpense(@PathVariable Long id) {
-        Optional<Expense> expense = expenseService.getExpenseById(id);
-
-        if (!expense.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Gasto no encontrado.");
-        }
-
-        expenseService.deleteExpense(id);
-        return ResponseEntity.ok("Gasto eliminado exitosamente.");
-    }*/
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<?> deleteExpenseById(@PathVariable Long id) {
+        return expenseService.getExpenseById(id)
+                .map(userDTO -> {
+                    expenseService.deleteExpense(id);
+                    return ResponseEntity.status(HttpStatus.OK).body("Usuario con ID " + id + " eliminado exitosamente.");
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + id + " no encontrado."));
+    }
 }
