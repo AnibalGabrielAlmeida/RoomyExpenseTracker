@@ -42,13 +42,8 @@ public class    HouseService implements IHouseService{
 
     @Override
     public HouseDTO createHouse(HouseCreationDTO houseCreationDTO) {
-        // Mapea el DTO de entrada a entidad
         House house = houseMapper.toEntity(houseCreationDTO);
-
-        // Guarda en la base de datos
         House savedHouse = houseRepository.save(house);
-
-        // Mapea la entidad a DTO para la respuesta
         return houseMapper.toDTO(savedHouse);
     }
 

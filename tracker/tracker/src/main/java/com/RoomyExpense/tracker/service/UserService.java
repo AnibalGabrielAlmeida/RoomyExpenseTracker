@@ -92,33 +92,6 @@ public class UserService implements  IUserService {
         }
     }
 
-
-
-
-
-
-    /*public UserDTO createUser(UserCreationDTO userCreationDTO) {
-        User user = userMapper.toEntity(userCreationDTO);
-        Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
-        if (houseOptional.isEmpty()) {
-            throw new EntityNotFoundException("La casa con ID " + userCreationDTO.getHouseId() + " no existe.");
-        }
-
-        HouseCreationDTO houseCreationDTO = new HouseCreationDTO(
-                houseOptional.get().getName(),
-                houseOptional.get().getAddress()
-        );
-        House house = houseMapper.toEntity(houseCreationDTO);
-
-        user.setHouse(house);
-
-        User savedUser = userRepository.save(user);
-
-        return userMapper.toUserDTO(savedUser);
-    }*/
-
-
-
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
