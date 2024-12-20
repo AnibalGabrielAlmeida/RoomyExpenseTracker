@@ -9,11 +9,8 @@ import com.RoomyExpense.tracker.repository.HouseRepository;
 import com.RoomyExpense.tracker.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,38 +35,38 @@ public class UserService implements  IUserService {
 
     @Override
     public List<UserDTO> getAllUsers() {
-        List<User> users = userRepository.findAll(); // Obtener lista de usuarios
+        List<User> users = userRepository.findAll(); // Getting users List
         return users.stream()
-                .map(userMapper::toUserDTO)
-                .collect(Collectors.toList()); // Convertir a UserDTO
+                .map(userMapper::toUserDTO)//mapping user to dto
+                .collect(Collectors.toList()); //to list
     }
 
     @Override
     public Optional<UserDTO> getUserById(Long id) {
-        Optional<User> userOptional = userRepository.findById(id); // Obtener usuario por ID
-        return userOptional.map(userMapper::toUserDTO); // Convertir a UserDTO si está presente
+        Optional<User> userOptional = userRepository.findById(id); // Getting user by id
+        return userOptional.map(userMapper::toUserDTO); // mapping to user dto if it is present
     }
 
     @Override
     public UserDTO createUser(UserCreationDTO userCreationDTO) {
-        System.out.println("Creando usuario con datos: " + userCreationDTO);
+        System.out.println("Creating user with this information: " + userCreationDTO);
 
-        // Mapeo de usuario
+        //mapping to user
         User user = userMapper.toEntity(userCreationDTO);
-        System.out.println("Usuario convertido a entidad: " + user);
+        System.out.println("User mapped to entity: " + user);
 
         // Intentar asociar la casa
         Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
         houseOptional.ifPresent(houseDTO -> {
             Optional<House> existingHouse = houseRepository.findById(houseDTO.getId());
             existingHouse.ifPresent(user::setHouse);
-            System.out.println("Casa asociada al usuario: " + existingHouse.orElse(null));
+            System.out.println("house linked to user: " + existingHouse.orElse(null));
         });
 
 
         // Guardar usuario en la base de datos
         User savedUser = userRepository.save(user);
-        System.out.println("Usuario guardado en base de datos: " + savedUser);
+        System.out.println("User saved in DB: " + savedUser);
 
         return userMapper.toUserDTO(savedUser);
     }
@@ -80,25 +77,27 @@ public class UserService implements  IUserService {
         userRepository.deleteById(id);
     }
 
+
+    //todo transfer code to service, use mapper.
    @Override
     public UserDTO changeUserRole(Long userId, UserRoleUpdateDTO updateRoleDTO) {
-        // Buscar usuario
+        // User search
         Optional<User> userOptional = userRepository.findById(userId);
         if (!userOptional.isPresent()) {
-            throw new EntityNotFoundException("Usuario no encontrado");
+            throw new EntityNotFoundException("User not found");
         }
 
         User user = userOptional.get();
 
-        // Mapeo desde UserUpdateDTO a User
+
 
         user.setRole(updateRoleDTO.getRole());
 
 
-        // Guardar usuario actualizado
+
         user = userRepository.save(user);
 
-        // Mapeo desde User a UserDTO para mostrar los datos actualizados
+
         UserDTO userDTO = new UserDTO(
                 user.getId(),
                 user.getName(),

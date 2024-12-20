@@ -22,7 +22,7 @@ public class ExpenseShareService {
 
     @Autowired
     private UserRepository userRepository;
-
+//todo this implementation.
     public ExpenseShare createExpenseShare(ExpenseShareCreationDTO dto) {
         // Buscar la expensa por su ID
         Expense expense = expenseRepository.findById(dto.getExpenseId())

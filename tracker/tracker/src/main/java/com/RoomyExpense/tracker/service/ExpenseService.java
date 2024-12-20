@@ -7,7 +7,6 @@ import com.RoomyExpense.tracker.mapper.ExpenseMapper;
 import com.RoomyExpense.tracker.mapper.HouseMapper;
 import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.model.House;
-import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.repository.ExpenseRepository;
 import com.RoomyExpense.tracker.repository.HouseRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,7 +43,7 @@ public class ExpenseService implements IExpenseService {
 
     @Override
     public Optional<ExpenseDTO> getExpenseById(Long id){
-        Optional<Expense> expenseOptional = expenseRepository.findById(id); // Obtener usuario por ID
+        Optional<Expense> expenseOptional = expenseRepository.findById(id);
         return expenseOptional.map(expenseMapper::toDTO);
     }
 
@@ -55,17 +53,17 @@ public class ExpenseService implements IExpenseService {
         Optional<HouseDTO> houseOptional = houseService.getHouseById(expenseCreationDTO.getHouseId());
 
         if (houseOptional.isEmpty()) {
-            throw new EntityNotFoundException("Casa no encontrada.");
+            throw new EntityNotFoundException("House not found.");
         }
 
         House house = houseRepository.findById(houseOptional.get().getId())
                 .orElseGet(() -> houseRepository.save(houseMapper.DTOToEntity(houseOptional.get())));
 
-        // Crear gasto y asociar la casa
+
         Expense expense = expenseMapper.toEntity(expenseCreationDTO);
         expense.setHouse(house);
 
-        // Guardar el gasto
+
         return expenseRepository.save(expense);
     }
 
@@ -76,6 +74,7 @@ public class ExpenseService implements IExpenseService {
         expenseRepository.deleteById(id);
     }
 
+    //todo implement this.
     @Override
     public List<Expense> getExpensesByHouse(House house) {
         return expenseRepository.findByHouse(house);

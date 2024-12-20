@@ -3,9 +3,6 @@ package com.RoomyExpense.tracker.controller;
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
-import com.RoomyExpense.tracker.mapper.UserMapper;
-import com.RoomyExpense.tracker.model.House;
-import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
 import com.RoomyExpense.tracker.service.IUserService;
 import jakarta.validation.Valid;
@@ -13,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/house")

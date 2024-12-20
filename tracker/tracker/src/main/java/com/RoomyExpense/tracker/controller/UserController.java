@@ -2,10 +2,6 @@ package com.RoomyExpense.tracker.controller;
 
 import com.RoomyExpense.tracker.DTO.UserCreationDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
-import com.RoomyExpense.tracker.DTO.UserRoleUpdateDTO;
-import com.RoomyExpense.tracker.DTO.UserUpdateDTO;
-import com.RoomyExpense.tracker.model.House;
-import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
 import com.RoomyExpense.tracker.service.IUserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,10 +12,8 @@ import org.springframework.http.ResponseEntity;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/user")

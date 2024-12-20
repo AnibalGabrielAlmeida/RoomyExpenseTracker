@@ -8,7 +8,6 @@ import com.RoomyExpense.tracker.mapper.ExpenseMapper;
 import com.RoomyExpense.tracker.mapper.PaymentMapper;
 import com.RoomyExpense.tracker.mapper.UserMapper;
 import com.RoomyExpense.tracker.model.Expense;
-import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.Payment;
 import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.repository.ExpenseRepository;
@@ -17,7 +16,6 @@ import com.RoomyExpense.tracker.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -62,16 +60,16 @@ public class PaymentService implements IPaymentService {
         Optional<UserDTO> userOptional = userService.getUserById(paymentCreationDTO.getUserId());
         Optional<ExpenseDTO> expenseOptional = expenseService.getExpenseById(paymentCreationDTO.getExpenseId());
         if(userOptional.isEmpty()){
-            throw new EntityNotFoundException("Usuario no encontrado");
+            throw new EntityNotFoundException("User not found");
         }
         if(expenseOptional.isEmpty()){
-            throw  new EntityNotFoundException("Gasto no encontrado");
+            throw  new EntityNotFoundException("Expense not found");
         }
         User user = userRepository.findById(userOptional.get().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no existe en la base de datos"));
+                .orElseThrow(() -> new EntityNotFoundException("User is not registered in the DB"));
 
         Expense expense = expenseRepository.findById(expenseOptional.get().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Gasto no existe en la base de datos"));
+                .orElseThrow(() -> new EntityNotFoundException("Expense is not registered in the DB"));
 
         Payment payment = paymentMapper.toEntity(paymentCreationDTO);
         payment.setUser(user);
