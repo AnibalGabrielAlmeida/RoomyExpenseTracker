@@ -8,7 +8,10 @@ import com.RoomyExpense.tracker.mapper.UserMapper;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.repository.HouseRepository;
+import com.RoomyExpense.tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +24,8 @@ public class    HouseService implements IHouseService{
 
     @Autowired
     private HouseRepository houseRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private HouseMapper houseMapper;
     @Autowired
@@ -51,6 +56,7 @@ public class    HouseService implements IHouseService{
     public void deleteHouse(Long id) {
         houseRepository.deleteById(id);
     }
+
     @Override
     public List<UserDTO> getRoommatesByHouseId(Long houseId) {
         List<User> roommates = houseRepository.findRoommatesByHouseId(houseId);
@@ -60,4 +66,40 @@ public class    HouseService implements IHouseService{
 
 
     }
+
+    @Override
+    public HouseDTO addExistingUserToHouse(Long houseId, Long userId) {
+        // Obtener la casa por ID
+        Optional<House> houseOptional = houseRepository.findById(houseId);
+        if (houseOptional.isEmpty()) {
+            throw new IllegalArgumentException("Casa con ID " + houseId + " no encontrada.");
+        }
+        House house = houseOptional.get();
+
+        // Obtener el usuario por ID
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("Usuario con ID " + userId + " no encontrado.");
+        }
+        User user = userOptional.get();
+
+        // Verificar si el usuario ya está asignado a una casa
+        if (user.getHouse() != null) {
+            throw new IllegalStateException("El usuario ya está asignado a una casa.");
+        }
+
+        // Establecer la relación bidireccional
+        user.setHouse(house);
+        house.getRoommates().add(user);
+
+        // Guardar los cambios
+        userRepository.save(user);
+        houseRepository.save(house);
+
+        // Crear el DTO actualizado
+        return houseMapper.toDTO(house);
+    }
+
+
+
 }

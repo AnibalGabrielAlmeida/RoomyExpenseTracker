@@ -3,6 +3,8 @@ package com.RoomyExpense.tracker.controller;
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
+import com.RoomyExpense.tracker.model.House;
+import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
 import com.RoomyExpense.tracker.service.IUserService;
 import jakarta.validation.Valid;
@@ -72,40 +74,19 @@ public class HouseController {
         return ResponseEntity.ok(roommatesDTOs);
     }
 
-/*
-    @PostMapping("/addExistingUser/{houseId}/{userId}")
-    public ResponseEntity<?> addExistingUserToHouse(@PathVariable Long houseId, @PathVariable Long userId) {
-        Optional<House> houseOptional = houseService.getHouseById(houseId);
 
-        if (houseOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa con ID " + houseId + " no encontrada.");
+    @PatchMapping("/{houseId}/add-user/{userId}")
+    public ResponseEntity<HouseDTO> addExistingUserToHouse(
+            @PathVariable Long houseId,
+            @PathVariable Long userId) {
+        try {
+            HouseDTO updatedHouse = houseService.addExistingUserToHouse(houseId, userId);
+            return ResponseEntity.ok(updatedHouse);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(null);
         }
-
-        Optional<User> userOptional = userService.getUserById(userId);
-
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + userId + " no encontrado.");
-        }
-
-        House house = houseOptional.get();
-        User user = userOptional.get();
-
-        // Verificar si el usuario ya está asignado a una casa
-        if (user.getHouse() != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya está asignado a una casa.");
-        }
-
-        // Establecer la relación bidireccional
-        user.setHouse(house);
-        house.getRoommates().add(user);
-
-        // Guardar cambios
-        userService.saveUser(user);
-        houseService.saveHouse(house);
-
-        return ResponseEntity.status(HttpStatus.OK).body("Usuario agregado exitosamente a la casa.");
     }
-*/
+
 
 
 /*
