@@ -51,20 +51,25 @@ public class UserService implements  IUserService {
     public UserDTO createUser(UserCreationDTO userCreationDTO) {
         System.out.println("Creating user with this information: " + userCreationDTO);
 
-        //mapping to user
+
         User user = userMapper.toEntity(userCreationDTO);
         System.out.println("User mapped to entity: " + user);
 
-        // Intentar asociar la casa
-        Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
+        if (userCreationDTO.getHouseId() != null) {
+            Optional<House> existingHouse = houseRepository.findById(userCreationDTO.getHouseId());
+            existingHouse.ifPresent(user::setHouse);
+        }
+
+        // Trying to link to house if not existing, notting happens
+        /*Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
         houseOptional.ifPresent(houseDTO -> {
             Optional<House> existingHouse = houseRepository.findById(houseDTO.getId());
             existingHouse.ifPresent(user::setHouse);
             System.out.println("house linked to user: " + existingHouse.orElse(null));
         });
+*/
 
-
-        // Guardar usuario en la base de datos
+        // Saving user in DB
         User savedUser = userRepository.save(user);
         System.out.println("User saved in DB: " + savedUser);
 

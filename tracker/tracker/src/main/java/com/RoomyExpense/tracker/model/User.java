@@ -39,7 +39,7 @@ public class User {
 
 
     @ManyToOne
-    @JoinColumn(name = "house_id")
+    @JoinColumn(name = "house_id", nullable = true)
     @JsonBackReference
     private House house;
 

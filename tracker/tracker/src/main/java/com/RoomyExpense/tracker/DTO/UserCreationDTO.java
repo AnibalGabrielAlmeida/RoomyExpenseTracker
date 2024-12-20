@@ -32,8 +32,8 @@ public class UserCreationDTO {
     )
     private String phoneNumber;
 
-    @NotNull(message = "House ID cannot be null")
-    private Long houseId; // Este valor debe existir, pero eso se valida en el servicio/repository.
+
+    private Long houseId;
 
     @NotBlank(message = "Role cannot be blank")
     @Pattern(regexp = "ADMIN|ROOMY", message = "Role must be either ADMIN or ROOMY")
