@@ -3,8 +3,6 @@ package com.RoomyExpense.tracker.controller;
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
-import com.RoomyExpense.tracker.model.House;
-import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
 import com.RoomyExpense.tracker.service.IUserService;
 import jakarta.validation.Valid;
@@ -35,6 +33,7 @@ public class HouseController {
         }
 
     }
+
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllHouses() {
         List<HouseDTO> houseDTOs = houseService.getAllHouses();
@@ -74,8 +73,7 @@ public class HouseController {
         return ResponseEntity.ok(roommatesDTOs);
     }
 
-
-    @PatchMapping("/{houseId}/add-user/{userId}")
+    @PatchMapping("/{houseId}/addRoommate/{userId}")
     public ResponseEntity<HouseDTO> addExistingUserToHouse(
             @PathVariable Long houseId,
             @PathVariable Long userId) {
@@ -87,43 +85,18 @@ public class HouseController {
         }
     }
 
-
-
-/*
-
-    @DeleteMapping("/removeUser/{houseId}/{userId}")
-    public ResponseEntity<?> removeUserFromHouse(@PathVariable Long houseId, @PathVariable Long userId) {
-        Optional<House> houseOptional = houseService.getHouseById(houseId);
-
-        if (houseOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa con ID " + houseId + " no encontrada.");
+    @PatchMapping("/{houseId}/removeRoommate/{userId}")
+    public ResponseEntity<HouseDTO> removeUserFromHouse(
+            @PathVariable Long houseId,
+            @PathVariable Long userId) {
+        try {
+            HouseDTO houseDTO = houseService.removeUserFromHouse(houseId, userId);
+            return ResponseEntity.ok(houseDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null); // O puedes manejar el error de otra manera
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // o BAD_REQUEST según sea el caso
         }
-
-        House house = houseOptional.get();
-
-        // Buscar al usuario en la lista de roommates
-        Optional<User> userOptional = house.getRoommates().stream()
-                .filter(user -> user.getId().equals(userId))
-                .findFirst();
-
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario con ID " + userId + " no encontrado en la casa.");
-        }
-
-        User user = userOptional.get();
-
-        // Eliminar al usuario de la lista de roommates de la casa
-        house.getRoommates().remove(user);
-
-        // Desasociar la casa del usuario
-        user.setHouse(null);
-
-        // Guardar los cambios
-        houseService.saveHouse(house);
-        userService.saveUser(user); // Necesitas un servicio que guarde el usuario
-
-        return ResponseEntity.status(HttpStatus.OK).body("Usuario eliminado exitosamente de la casa.");
     }
-*/
 
 }

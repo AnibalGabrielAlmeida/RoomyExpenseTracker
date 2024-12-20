@@ -16,4 +16,5 @@ public interface IHouseService {
     HouseDTO createHouse(HouseCreationDTO houseCreationDTO);
     List<UserDTO> getRoommatesByHouseId(Long houseId);
     HouseDTO addExistingUserToHouse(Long houseId, Long userId);
+    HouseDTO removeUserFromHouse (Long houseId, Long userId);
 }

@@ -10,8 +10,6 @@ import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.repository.HouseRepository;
 import com.RoomyExpense.tracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,6 +52,7 @@ public class    HouseService implements IHouseService{
 
     @Override
     public void deleteHouse(Long id) {
+
         houseRepository.deleteById(id);
     }
 
@@ -100,6 +99,38 @@ public class    HouseService implements IHouseService{
         return houseMapper.toDTO(house);
     }
 
+    @Override
+    public HouseDTO removeUserFromHouse(Long houseId, Long userId){
+        Optional<House> houseOptional = houseRepository.findById(houseId);
 
+        if (houseOptional.isEmpty()) {
+            throw new  IllegalArgumentException("Usuario con ID " + userId + " no encontrado.");
+        }
+
+        House house = houseOptional.get();
+
+        // Buscar al usuario en la lista de roommates
+        Optional<User> userOptional = house.getRoommates().stream()
+                .filter(user -> user.getId().equals(userId))
+                .findFirst();
+
+        if (userOptional.isEmpty()) {
+            throw new IllegalStateException("No hay usuario con ese ID asignado a la casa.");
+        }
+
+        User user = userOptional.get();
+
+        // Eliminar al usuario de la lista de roommates de la casa
+        house.getRoommates().remove(user);
+
+        // Desasociar la casa del usuario
+        user.setHouse(null);
+
+        // Guardar los cambios
+        houseRepository.save(house);
+        userRepository.save(user);
+
+        return houseMapper.toDTO(house);
+    }
 
 }
