@@ -1,6 +1,7 @@
 package com.RoomyExpense.tracker.controller;
 
 import com.RoomyExpense.tracker.DTO.ExpenseCreationDTO;
+import com.RoomyExpense.tracker.DTO.ExpenseUpdateDTO;
 import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.service.IExpenseService;
 import com.RoomyExpense.tracker.DTO.ExpenseDTO;
@@ -68,6 +69,16 @@ public class ExpenseController {
                     return ResponseEntity.status(HttpStatus.OK).body("Expense with ID " + id + " successfully deleted.");
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense with ID " + id + " not found."));
+    }
+
+    @PatchMapping("/updateExpense/{expenseId}")
+    public ResponseEntity<Expense> updateExpense(
+            @PathVariable Long expenseId,
+            @RequestBody ExpenseUpdateDTO expenseUpdateDTO) {
+
+        Expense updatedExpense = expenseService.updateExpense(expenseId, expenseUpdateDTO);
+
+        return ResponseEntity.ok(updatedExpense);
     }
 
     /*
