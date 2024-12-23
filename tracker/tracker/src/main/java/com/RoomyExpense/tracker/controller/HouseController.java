@@ -5,6 +5,8 @@ import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
 import com.RoomyExpense.tracker.service.IHouseService;
 import com.RoomyExpense.tracker.service.IUserService;
+import com.RoomyExpense.tracker.model.House;
+import com.RoomyExpense.tracker.DTO.HouseUpdateDTO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -62,6 +64,16 @@ public class HouseController {
                     return ResponseEntity.status(HttpStatus.OK).body("House with ID " + id + " successfully deleted.");
                 })
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("House with ID " + id + " not found."));
+    }
+
+    @PatchMapping("/updateHouse/{houseId}")
+    public ResponseEntity<House> updateHouse(
+            @PathVariable Long houseId,
+            @RequestBody HouseUpdateDTO houseUpdateDTO) {
+
+        House updatedHouse = houseService.updateHouse(houseId, houseUpdateDTO);
+
+        return ResponseEntity.ok(updatedHouse);
     }
 
     @GetMapping("/{houseId}/roommates")

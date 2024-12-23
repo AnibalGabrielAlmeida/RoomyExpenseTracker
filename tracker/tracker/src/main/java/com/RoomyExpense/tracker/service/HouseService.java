@@ -2,6 +2,7 @@ package com.RoomyExpense.tracker.service;
 
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
+import com.RoomyExpense.tracker.DTO.HouseUpdateDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
 import com.RoomyExpense.tracker.mapper.HouseMapper;
 import com.RoomyExpense.tracker.mapper.UserMapper;
@@ -9,6 +10,8 @@ import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.repository.HouseRepository;
 import com.RoomyExpense.tracker.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -131,6 +134,22 @@ public class    HouseService implements IHouseService{
         userRepository.save(user);
 
         return houseMapper.toDTO(house);
+    }
+
+    @Override
+    @Transactional
+    public House updateHouse(Long houseId, HouseUpdateDTO houseUpdateDTO) {
+        House house = houseRepository.findById(houseId)
+                .orElseThrow(() -> new EntityNotFoundException("House with ID " + houseId + " not found"));
+
+        if (houseUpdateDTO.getName() != null) {
+            house.setName(houseUpdateDTO.getName());
+        }
+        if (houseUpdateDTO.getAddress() != null) {
+            house.setAddress(houseUpdateDTO.getAddress());
+        }
+
+        return houseRepository.save(house);
     }
 
 }

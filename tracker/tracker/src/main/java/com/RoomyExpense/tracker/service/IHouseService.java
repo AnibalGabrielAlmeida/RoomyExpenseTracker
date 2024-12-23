@@ -2,9 +2,11 @@ package com.RoomyExpense.tracker.service;
 
 import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
+import com.RoomyExpense.tracker.DTO.HouseUpdateDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.model.User;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +19,7 @@ public interface IHouseService {
     List<UserDTO> getRoommatesByHouseId(Long houseId);
     HouseDTO addExistingUserToHouse(Long houseId, Long userId);
     HouseDTO removeUserFromHouse (Long houseId, Long userId);
+
+    @Transactional
+    House updateHouse(Long houseId, HouseUpdateDTO houseUpdateDTO);
 }
