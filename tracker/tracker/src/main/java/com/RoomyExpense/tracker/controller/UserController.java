@@ -2,6 +2,9 @@ package com.RoomyExpense.tracker.controller;
 
 import com.RoomyExpense.tracker.DTO.UserCreationDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
+import com.RoomyExpense.tracker.DTO.UserRoleUpdateDTO;
+import com.RoomyExpense.tracker.DTO.UserUpdateDTO;
+import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.service.IHouseService;
 import com.RoomyExpense.tracker.service.IUserService;
 import jakarta.persistence.EntityNotFoundException;
@@ -60,7 +63,6 @@ public class UserController {
         return ResponseEntity.ok(userDTOOptional.get());
     }
 
-
     @DeleteMapping("/deleteById/{id}")
     public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
         return userService.getUserById(id)
@@ -71,28 +73,23 @@ public class UserController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + id + " not found."));
     }
 
-    /*
+    @PatchMapping("/updateUser/{userId}")
+    public ResponseEntity<User> updateUser(
+            @PathVariable Long userId,
+            @RequestBody UserUpdateDTO userUpdateDTO) {
+
+        User updatedUser = userService.updateUser(userId, userUpdateDTO);
+
+        return ResponseEntity.ok(updatedUser);
+    }
+
     @PatchMapping("/{userId}/role")
-    public ResponseEntity<UserDTO> changeUserRole(@PathVariable Long userId, @RequestBody UserRoleUpdateDTO updateRoleDTO) {
+    public ResponseEntity<UserDTO> changeUserRole(
+            @PathVariable Long userId,
+            @RequestBody @Valid UserRoleUpdateDTO updateRoleDTO) {
+
         UserDTO updatedUser = userService.changeUserRole(userId, updateRoleDTO);
         return ResponseEntity.ok(updatedUser);
     }
-*/
 
-
-
-   /* @PatchMapping("/{userId}")
-    public User updateUser(@PathVariable Long userId, @RequestBody UserUpdateDTO userUpdateDTO) {
-        User user = userService.getUserById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
-
-        // Usar BeanUtils para copiar solo los campos no nulos
-        if (userUpdateDTO.getName() != null) user.setName(userUpdateDTO.getName());
-        if (userUpdateDTO.getEmail() != null) user.setEmail(userUpdateDTO.getEmail());
-        if (userUpdateDTO.getPhoneNumber() != null) user.setPhoneNumber(userUpdateDTO.getPhoneNumber());
-        if (userUpdateDTO.getHouseId() != null) user.setHouseId(userUpdateDTO.getHouseId());
-
-
-        return userService.saveUser(user);
-    }*/
 }

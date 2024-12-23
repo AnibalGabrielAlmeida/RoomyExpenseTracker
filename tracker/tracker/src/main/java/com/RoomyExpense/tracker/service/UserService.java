@@ -8,6 +8,7 @@ import com.RoomyExpense.tracker.model.User;
 import com.RoomyExpense.tracker.repository.HouseRepository;
 import com.RoomyExpense.tracker.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -51,7 +52,6 @@ public class UserService implements  IUserService {
     public UserDTO createUser(UserCreationDTO userCreationDTO) {
         System.out.println("Creating user with this information: " + userCreationDTO);
 
-
         User user = userMapper.toEntity(userCreationDTO);
         System.out.println("User mapped to entity: " + user);
 
@@ -60,61 +60,58 @@ public class UserService implements  IUserService {
             existingHouse.ifPresent(user::setHouse);
         }
 
-        // Trying to link to house if not existing, notting happens
-        /*Optional<HouseDTO> houseOptional = houseService.getHouseById(userCreationDTO.getHouseId());
-        houseOptional.ifPresent(houseDTO -> {
-            Optional<House> existingHouse = houseRepository.findById(houseDTO.getId());
-            existingHouse.ifPresent(user::setHouse);
-            System.out.println("house linked to user: " + existingHouse.orElse(null));
-        });
-*/
-
-        // Saving user in DB
         User savedUser = userRepository.save(user);
         System.out.println("User saved in DB: " + savedUser);
 
         return userMapper.toUserDTO(savedUser);
     }
 
-
     @Override
     public void deleteUser(Long id) {
+
         userRepository.deleteById(id);
     }
 
+    @Transactional
+    @Override
+    public User updateUser(Long userId, UserUpdateDTO userUpdateDTO) {
 
-    //todo transfer code to service, use mapper.
-   @Override
-    public UserDTO changeUserRole(Long userId, UserRoleUpdateDTO updateRoleDTO) {
-        // User search
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (!userOptional.isPresent()) {
-            throw new EntityNotFoundException("User not found");
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with ID " + userId + " not found"));
+
+        if (userUpdateDTO.getName() != null) {
+            user.setName(userUpdateDTO.getName());
+        }
+        if (userUpdateDTO.getEmail() != null) {
+            user.setEmail(userUpdateDTO.getEmail());
+        }
+        if (userUpdateDTO.getPhoneNumber() != null) {
+            user.setPhoneNumber(userUpdateDTO.getPhoneNumber());
+        }
+        if (userUpdateDTO.getHouseId() != null) {
+            House house = houseRepository.findById(userUpdateDTO.getHouseId())
+                    .orElseThrow(() -> new EntityNotFoundException("House with ID " + userUpdateDTO.getHouseId() + " not found"));
+            user.setHouse(house);
         }
 
-        User user = userOptional.get();
+        return userRepository.save(user);
+    }
 
+    @Override
+    @Transactional
+    public UserDTO changeUserRole(Long userId, UserRoleUpdateDTO updateRoleDTO) {
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with ID " + userId + " not found"));
+
+        if (updateRoleDTO.getRole() == null) {
+            throw new IllegalArgumentException("Role must not be null");
+        }
 
         user.setRole(updateRoleDTO.getRole());
-
-
-
         user = userRepository.save(user);
 
-
-        UserDTO userDTO = new UserDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getRegistrationDate(),
-                user.getHouse() != null ? user.getHouse().getName() : null,
-                user.getHouse() != null ? "/api/houses/" + user.getHouse().getId() : null,
-                user.getRole().toString()
-        );
-
-        return userDTO;
+        return userMapper.toUserDTO(user);
     }
 
 }
