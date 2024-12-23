@@ -1,9 +1,6 @@
 package com.RoomyExpense.tracker.service;
 
-import com.RoomyExpense.tracker.DTO.ExpenseDTO;
-import com.RoomyExpense.tracker.DTO.PaymentCreationDTO;
-import com.RoomyExpense.tracker.DTO.PaymentDTO;
-import com.RoomyExpense.tracker.DTO.UserDTO;
+import com.RoomyExpense.tracker.DTO.*;
 import com.RoomyExpense.tracker.mapper.ExpenseMapper;
 import com.RoomyExpense.tracker.mapper.PaymentMapper;
 import com.RoomyExpense.tracker.mapper.UserMapper;
@@ -14,6 +11,7 @@ import com.RoomyExpense.tracker.repository.ExpenseRepository;
 import com.RoomyExpense.tracker.repository.PaymentRepository;
 import com.RoomyExpense.tracker.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -83,4 +81,21 @@ public class PaymentService implements IPaymentService {
         paymentRepository.deleteById(id);
     }
 
+
+    @Transactional
+    @Override
+    public Payment updatePayment(Long paymentId, PaymentUpdateDTO paymentUpdateDTO) {
+
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new EntityNotFoundException("Payment with ID " + paymentId + " not found"));
+
+        if (paymentUpdateDTO.getAmount() != null) {
+            payment.setAmount(paymentUpdateDTO.getAmount());
+        }
+        if (paymentUpdateDTO.getState() != null) {
+            payment.setState(Payment.State.valueOf(paymentUpdateDTO.getState()));
+        }
+
+        return paymentRepository.save(payment);
+    }
 }

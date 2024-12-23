@@ -2,6 +2,7 @@ package com.RoomyExpense.tracker.controller;
 
 import com.RoomyExpense.tracker.DTO.PaymentCreationDTO;
 import com.RoomyExpense.tracker.DTO.PaymentDTO;
+import com.RoomyExpense.tracker.DTO.PaymentUpdateDTO;
 import com.RoomyExpense.tracker.model.Payment;
 import com.RoomyExpense.tracker.service.ExpenseService;
 import com.RoomyExpense.tracker.service.PaymentService;
@@ -69,4 +70,13 @@ public class PaymentController {
                 }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Payment with Id: " + id + " not found"));
     }
 
+    @PatchMapping("/updatePayment/{paymentId}")
+    public ResponseEntity<Payment> updatePayment(
+            @PathVariable Long paymentId,
+            @RequestBody PaymentUpdateDTO paymentUpdateDTO) {
+
+        Payment updatedPayment = paymentService.updatePayment(paymentId, paymentUpdateDTO);
+
+        return ResponseEntity.ok(updatedPayment);
+    }
 }

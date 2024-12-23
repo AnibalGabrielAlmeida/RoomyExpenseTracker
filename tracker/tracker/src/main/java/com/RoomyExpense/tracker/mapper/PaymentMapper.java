@@ -24,7 +24,8 @@ public class PaymentMapper {
                 payment.getPaymentDate(),
                 payment.getAmount(),
                 payment.getUser().getName(),
-                payment.getExpense().getName()
+                payment.getExpense().getName(),
+                payment.getState().name()
         );
     }
 }
