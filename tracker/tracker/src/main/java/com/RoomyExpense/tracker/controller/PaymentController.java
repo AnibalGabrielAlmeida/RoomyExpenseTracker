@@ -23,18 +23,13 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ExpenseService expenseService;
-
     @PostMapping("/createPayment")
     public ResponseEntity<?> createPayment(@RequestBody PaymentCreationDTO paymentCreationDTO){
         try {
             Payment payment = paymentService.createPayment(paymentCreationDTO);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Payment successfully created. User: " + payment.getUser().getName()
+                    .body("Payment successfully created ID: " + payment.getId() +
+                            "\n User: " + payment.getUser().getName()
                             + "\nExpense: " + payment.getExpense().getName() );
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

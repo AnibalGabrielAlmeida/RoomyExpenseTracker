@@ -37,5 +37,5 @@ public class Expense {
     private House house;
 
     @OneToMany(mappedBy = "expense")
-    private List<ExpenseShare> expenseShare;
+    private List<ExpenseSplit> expenseSplit;
 }

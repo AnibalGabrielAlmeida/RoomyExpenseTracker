@@ -92,9 +92,7 @@ public class PaymentService implements IPaymentService {
         if (paymentUpdateDTO.getAmount() != null) {
             payment.setAmount(paymentUpdateDTO.getAmount());
         }
-        if (paymentUpdateDTO.getState() != null) {
-            payment.setState(Payment.State.valueOf(paymentUpdateDTO.getState()));
-        }
+
 
         return paymentRepository.save(payment);
     }

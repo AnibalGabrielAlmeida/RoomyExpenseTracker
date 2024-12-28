@@ -23,7 +23,7 @@ public class User {
     private Long id;
     private String name;
     private String email;
-    //Add user authentication admin/roomy
+
     private String password;
      public enum UserRole {
         ADMIN, ROOMY
@@ -46,4 +46,7 @@ public class User {
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Payment> payments;
+
+    @OneToMany(mappedBy = "user")
+    private List<ExpenseSplit> expenseSplits;
 }

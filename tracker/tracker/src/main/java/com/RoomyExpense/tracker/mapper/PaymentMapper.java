@@ -6,6 +6,7 @@ import com.RoomyExpense.tracker.model.Payment;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 @Component
 public class PaymentMapper {
@@ -24,8 +25,7 @@ public class PaymentMapper {
                 payment.getPaymentDate(),
                 payment.getAmount(),
                 payment.getUser().getName(),
-                payment.getExpense().getName(),
-                payment.getState().name()
+                payment.getExpense().getName()
         );
     }
 }

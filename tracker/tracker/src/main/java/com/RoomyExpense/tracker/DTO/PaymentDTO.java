@@ -12,5 +12,4 @@ public class PaymentDTO {
     private Double amount;
     private String userName;
     private String expenseName;
-    private String state;
 }
