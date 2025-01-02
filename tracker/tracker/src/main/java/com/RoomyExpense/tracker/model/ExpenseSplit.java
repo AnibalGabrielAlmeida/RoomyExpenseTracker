@@ -1,5 +1,6 @@
 package com.RoomyExpense.tracker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,10 +20,12 @@ public class ExpenseSplit {
 
     @ManyToOne
     @JoinColumn(name = "expense_id", nullable = false)
+    @JsonIgnore
     private Expense expense;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @Column(nullable = false)

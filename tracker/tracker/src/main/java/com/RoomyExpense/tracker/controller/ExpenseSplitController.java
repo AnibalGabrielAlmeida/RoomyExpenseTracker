@@ -2,6 +2,7 @@ package com.RoomyExpense.tracker.controller;
 
 import com.RoomyExpense.tracker.DTO.ExpenseSplitCreationDTO;
 import com.RoomyExpense.tracker.DTO.ExpenseSplitDTO;
+import com.RoomyExpense.tracker.DTO.ExpenseSplitUpdateDTO;
 import com.RoomyExpense.tracker.model.ExpenseSplit;
 import com.RoomyExpense.tracker.service.ExpenseSplitService;
 import jakarta.persistence.EntityNotFoundException;
@@ -63,5 +64,27 @@ public class ExpenseSplitController {
             return ResponseEntity.status(HttpStatus.OK).body("Expense Split not found");
         }
         return ResponseEntity.ok(expenseSplitDTO.get());
+    }
+
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<?> deleteExpenseSplit(@PathVariable Long id){
+        return expenseSplitService.getExpenseSplitById(id)
+                .map(expenseSplitDTO -> {expenseSplitService.deleteExpenseSplit(id);
+                return ResponseEntity.status(HttpStatus.OK).body("Expense Split with Id: " + id + " Succesfully eliminated.");
+                }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense Split with Id: " + id + " not found"));
+    }
+
+    @PatchMapping("/updateExpenseSplit/{expenseSplitId}")
+    public ResponseEntity<ExpenseSplit> updateExpenseSplit(
+            @PathVariable Long expenseSplitId,
+            @RequestBody ExpenseSplitUpdateDTO expenseSplitUpdateDTO) {
+        try {
+            ExpenseSplit updatedExpenseSplit = expenseSplitService.updateExpenseSplit(expenseSplitId, expenseSplitUpdateDTO);
+            return ResponseEntity.ok(updatedExpenseSplit);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 }
