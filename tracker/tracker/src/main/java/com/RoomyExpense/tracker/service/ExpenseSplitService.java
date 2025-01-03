@@ -5,6 +5,9 @@ import com.RoomyExpense.tracker.DTO.ExpenseDTO;
 import com.RoomyExpense.tracker.DTO.ExpenseSplitCreationDTO;
 import com.RoomyExpense.tracker.DTO.ExpenseSplitDTO;
 import com.RoomyExpense.tracker.DTO.ExpenseSplitUpdateDTO;
+import com.RoomyExpense.tracker.exception.ExpenseNotFoundException;
+import com.RoomyExpense.tracker.exception.ExpenseSplitNotFoundException;
+import com.RoomyExpense.tracker.exception.UserNotFoundException;
 import com.RoomyExpense.tracker.mapper.ExpenseSplitMapper;
 import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.model.ExpenseSplit;
@@ -43,11 +46,11 @@ public class ExpenseSplitService implements IExpenseSplit {
     public List<ExpenseSplit> createExpenseSplit(ExpenseSplitCreationDTO expenseSplitCreationDTO) {
         Optional<ExpenseDTO> expenseOptional = expenseService.getExpenseById(expenseSplitCreationDTO.getExpenseId());
         if (expenseOptional.isEmpty()) {
-            throw new EntityNotFoundException("Expense not found");
+            throw new ExpenseNotFoundException("Expense with ID " + expenseSplitCreationDTO.getExpenseId() + " not found");
         }
 
         Expense expense = expenseRepository.findById(expenseOptional.get().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Expense is not registered in the DB"));
+                .orElseThrow(() -> new ExpenseNotFoundException("Expense is not registered in the DB"));
 
         Double totalAmount = expense.getAmount();
         if (totalAmount == null || totalAmount <= 0) {
@@ -68,7 +71,7 @@ public class ExpenseSplitService implements IExpenseSplit {
         List<ExpenseSplit> expenseSplits = expenseSplitCreationDTO.getUserPercentages().stream()
                 .map(userPercentageDTO -> {
                     User user = userRepository.findById(userPercentageDTO.getUserId())
-                            .orElseThrow(() -> new EntityNotFoundException("User is not registered in the DB"));
+                            .orElseThrow(() -> new UserNotFoundException("User is not registered in the DB"));
                     ExpenseSplit expenseSplit = new ExpenseSplit();
                     expenseSplit.setUser(user);
                     expenseSplit.setExpense(expense);
@@ -91,13 +94,18 @@ public class ExpenseSplitService implements IExpenseSplit {
     @Override
     public Optional<ExpenseSplitDTO> getExpenseSplitById(Long id) {
 
-        Optional<ExpenseSplit> expenseOptional = expenseSplitRepository.findById(id);
-        return expenseOptional.map(expenseSplitMapper::toDTO);
+        ExpenseSplit expenseSplit = expenseSplitRepository.findById(id)
+                .orElseThrow(() -> new ExpenseSplitNotFoundException("ExpenseSplit with ID " + id + " not found"));
+        return Optional.of(expenseSplitMapper.toDTO(expenseSplit));
     }
 
     @Transactional
     @Override
     public void deleteExpenseSplit(Long id) {
+
+        if (!expenseSplitRepository.existsById(id)) {
+            throw new ExpenseSplitNotFoundException("ExpenseSplit with ID " + id + " not found");
+        }
         expenseSplitRepository.deleteById(id);
     }
 
@@ -106,7 +114,7 @@ public class ExpenseSplitService implements IExpenseSplit {
     public ExpenseSplit updateExpenseSplit(Long expenseSplitId, ExpenseSplitUpdateDTO expenseSplitUpdateDTO) {
         // Get the ExpenseSplit to update
         ExpenseSplit expenseSplit = expenseSplitRepository.findById(expenseSplitId)
-                .orElseThrow(() -> new EntityNotFoundException("ExpenseSplit with ID: " + expenseSplitId + " not found"));
+                .orElseThrow(() -> new ExpenseSplitNotFoundException("ExpenseSplit with ID: " + expenseSplitId + " not found"));
 
         // Get all ExpenseSplits related to the same Expense
         List<ExpenseSplit> allSplits = expenseSplitRepository.findByExpenseId(expenseSplit.getExpense().getId());
