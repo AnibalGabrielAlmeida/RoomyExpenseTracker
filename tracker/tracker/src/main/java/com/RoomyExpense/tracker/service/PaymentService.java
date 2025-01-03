@@ -1,13 +1,11 @@
 package com.RoomyExpense.tracker.service;
 
 import com.RoomyExpense.tracker.DTO.*;
-import com.RoomyExpense.tracker.mapper.ExpenseMapper;
 import com.RoomyExpense.tracker.mapper.PaymentMapper;
-import com.RoomyExpense.tracker.mapper.UserMapper;
-import com.RoomyExpense.tracker.model.Expense;
+import com.RoomyExpense.tracker.model.ExpenseSplit;
 import com.RoomyExpense.tracker.model.Payment;
 import com.RoomyExpense.tracker.model.User;
-import com.RoomyExpense.tracker.repository.ExpenseRepository;
+import com.RoomyExpense.tracker.repository.ExpenseSplitRepository;
 import com.RoomyExpense.tracker.repository.PaymentRepository;
 import com.RoomyExpense.tracker.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,17 +24,13 @@ public class PaymentService implements IPaymentService {
     @Autowired
     private UserService userService;
     @Autowired
-    private ExpenseService expenseService;
+    private ExpenseSplitService expenseService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private ExpenseRepository expenseRepository;
+    private ExpenseSplitRepository expenseRepository;
     @Autowired
     private PaymentMapper paymentMapper;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private ExpenseMapper expenseMapper;
 
     @Override
     public List<PaymentDTO> getAllPayments(){
@@ -56,7 +50,7 @@ public class PaymentService implements IPaymentService {
     @Override
     public Payment createPayment(PaymentCreationDTO paymentCreationDTO){
         Optional<UserDTO> userOptional = userService.getUserById(paymentCreationDTO.getUserId());
-        Optional<ExpenseDTO> expenseOptional = expenseService.getExpenseById(paymentCreationDTO.getExpenseId());
+        Optional<ExpenseSplitDTO> expenseOptional = expenseService.getExpenseSplitById(paymentCreationDTO.getExpenseId());
         if(userOptional.isEmpty()){
             throw new EntityNotFoundException("User not found");
         }
@@ -66,12 +60,12 @@ public class PaymentService implements IPaymentService {
         User user = userRepository.findById(userOptional.get().getId())
                 .orElseThrow(() -> new EntityNotFoundException("User is not registered in the DB"));
 
-        Expense expense = expenseRepository.findById(expenseOptional.get().getId())
+        ExpenseSplit expenseSplit = expenseRepository.findById(expenseOptional.get().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Expense is not registered in the DB"));
 
         Payment payment = paymentMapper.toEntity(paymentCreationDTO);
         payment.setUser(user);
-        payment.setExpense(expense);
+        payment.setExpenseSplit(expenseSplit);
 
         return paymentRepository.save(payment);
     }
