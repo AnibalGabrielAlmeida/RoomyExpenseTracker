@@ -22,6 +22,21 @@ public class GlobalExceptionHandler {
         return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ExpenseNotFoundException.class)
+    public ResponseEntity<Object> handleExpenseNotFoundException(ExpenseNotFoundException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ExpenseSplitNotFoundException.class)
+    public ResponseEntity<Object> handleExpenseSplitNotFoundException(ExpenseSplitNotFoundException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<Object> handlePaymentNotFoundException(PaymentNotFoundException ex) {
+        return buildResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(InvalidRoleException.class)
     public ResponseEntity<Object> handleInvalidRoleException(InvalidRoleException ex) {
         return buildResponse(ex.getMessage(), HttpStatus.BAD_REQUEST);
