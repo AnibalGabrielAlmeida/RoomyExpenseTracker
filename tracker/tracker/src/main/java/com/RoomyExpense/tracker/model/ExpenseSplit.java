@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter@Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +29,10 @@ public class ExpenseSplit {
     @JoinColumn(name = "user_id", nullable = false)
     @JsonIgnore
     private User user;
+
+    @OneToMany (mappedBy = "expense_split")
+    @JsonIgnore
+    private List<Payment> payments;
 
     @Column(nullable = false)
     private Double amount;

@@ -28,8 +28,8 @@ public class Payment {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "expense_id")
+    @JoinColumn(name = "expense_split_id")
     @JsonBackReference
-    private Expense expense;
+    private ExpenseSplit expenseSplit;
 
 }
