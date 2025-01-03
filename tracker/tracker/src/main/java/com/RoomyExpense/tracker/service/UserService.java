@@ -55,10 +55,8 @@ public class UserService implements IUserService {
     @Transactional
     @Override
     public UserDTO createUser(UserCreationDTO userCreationDTO) {
-        System.out.println("Creating user with this information: " + userCreationDTO);
 
         User user = userMapper.toEntity(userCreationDTO);
-        System.out.println("User mapped to entity: " + user);
 
         if (userCreationDTO.getHouseId() != null) {
             House house = houseRepository.findById(userCreationDTO.getHouseId())
@@ -67,7 +65,6 @@ public class UserService implements IUserService {
         }
 
         User savedUser = userRepository.save(user);
-        System.out.println("User saved in DB: " + savedUser);
 
         return userMapper.toUserDTO(savedUser);
     }
