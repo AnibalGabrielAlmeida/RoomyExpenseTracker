@@ -1,12 +1,10 @@
 package com.RoomyExpense.tracker.DTO;
 
-
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Getter
 @Setter
@@ -31,7 +29,6 @@ public class UserCreationDTO {
             message = "Phone number must match the format: AreaCode-Number (e.g., 011-12345678 or 0376-123456)"
     )
     private String phoneNumber;
-
 
     private Long houseId;
 

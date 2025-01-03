@@ -10,11 +10,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserPercentageDTO {
 
-    @NotNull(message = "El ID del usuario es obligatorio.")
+    @NotNull(message = "The user ID is required.")
     private Long userId;
 
-    @NotNull(message = "El porcentaje de división es obligatorio.")
-    @DecimalMin(value = "0.0", inclusive = true, message = "El porcentaje no puede ser menor a 0.")
-    @DecimalMax(value = "100.0", inclusive = true, message = "El porcentaje no puede ser mayor a 100.")
+    @NotNull(message = "The division percentage is required.")
+    @DecimalMin(value = "0.0", inclusive = true, message = "The percentage cannot be less than 0.")
+    @DecimalMax(value = "100.0", inclusive = true, message = "The percentage cannot exceed 100.")
     private Double divisionPercentage;
 }

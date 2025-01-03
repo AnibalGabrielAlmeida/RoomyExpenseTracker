@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExpenseSplitUpdateDTO {
-    @Positive(message = "El monto debe ser positivo.")
+    @Positive(message = "The amount must be positive.")
     private Double amount;
 
 

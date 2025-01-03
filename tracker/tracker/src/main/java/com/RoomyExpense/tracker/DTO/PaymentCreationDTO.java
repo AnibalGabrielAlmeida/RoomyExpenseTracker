@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PaymentCreationDTO {
-    @NotNull(message = "El ID del usuario es obligatorio.")
+    @NotNull(message = "The user ID is mandatory.")
     private Long userId;
 
-    @NotNull(message = "El ID del gasto es obligatorio.")
+    @NotNull(message = "The expense split ID is mandatory.")
     private Long expenseSplitId;
 
-    @NotNull(message = "El monto es obligatorio.")
-    @Positive(message = "El monto debe ser positivo.")
+    @NotNull(message = "The amount is mandatory.")
+    @Positive(message = "The amount must be positive.")
     private Double amount;
 }

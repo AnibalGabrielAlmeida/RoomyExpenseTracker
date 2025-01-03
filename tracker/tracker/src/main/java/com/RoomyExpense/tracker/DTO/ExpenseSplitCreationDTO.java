@@ -13,11 +13,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class ExpenseSplitCreationDTO {
-    @NotNull(message = "El ID del gasto es obligatorio.")
+    @NotNull(message = "Expense ID is required.")
     private Long expenseId;
 
-    @NotEmpty(message = "La lista de usuarios no puede estar vacía.")
+    @NotEmpty(message = "The list of users cannot be empty.")
     private List<UserPercentageDTO> userPercentages;
-
 }
-

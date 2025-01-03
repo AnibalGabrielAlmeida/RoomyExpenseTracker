@@ -1,6 +1,5 @@
 package com.RoomyExpense.tracker.DTO;
 
-import com.RoomyExpense.tracker.model.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -8,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 @Getter
 @Setter
@@ -27,8 +25,5 @@ public class UserUpdateDTO {
     )
     private String phoneNumber;
 
-
-    private Long houseId; // Puede ser null si no se actualiza la casa.
+    private Long houseId; // Can be null if the house is not updated.
 }
-
-

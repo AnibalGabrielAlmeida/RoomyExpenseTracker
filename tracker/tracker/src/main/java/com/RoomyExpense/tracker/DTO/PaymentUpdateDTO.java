@@ -7,10 +7,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PaymentUpdateDTO {
-    @Positive(message = "El monto debe ser positivo.")
+    @Positive(message = "The amount must be positive.")
     private Double amount;
 
-    @Pattern(regexp = "PAID|UNPAID", message = "El estado debe ser PAID o UNPAID.")
+    @Pattern(regexp = "PAID|UNPAID", message = "The state must be PAID or UNPAID.")
     private String state;
 }
-

@@ -8,12 +8,11 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class HouseCreationDTO {
-    @NotBlank(message = "El nombre de la casa no puede estar vacío.")
-    @Size(max = 100, message = "El nombre no puede superar los 100 caracteres.")
+    @NotBlank(message = "The name of the house cannot be blank.")
+    @Size(max = 100, message = "The name cannot exceed 100 characters.")
     private String name;
 
-    @NotBlank(message = "La dirección no puede estar vacía.")
-    @Size(max = 200, message = "La dirección no puede superar los 200 caracteres.")
+    @NotBlank(message = "The address cannot be blank.")
+    @Size(max = 200, message = "The address cannot exceed 200 characters.")
     private String address;
 }
-

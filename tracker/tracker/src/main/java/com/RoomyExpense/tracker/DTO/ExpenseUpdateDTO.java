@@ -9,19 +9,17 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 public class ExpenseUpdateDTO {
-    //translate
-    @Size(max = 100, message = "El nombre no puede superar los 100 caracteres.")
+    @Size(max = 100, message = "The name cannot exceed 100 characters.")
     private String name;
 
-    @Positive(message = "El monto debe ser positivo.")
+    @Positive(message = "The amount must be positive.")
     private Double amount;
 
-    @Pattern(regexp = "FIXED|VARIABLE", message = "La categoría debe ser FIXED o VARIABLE.")
+    @Pattern(regexp = "FIXED|VARIABLE", message = "The category must be FIXED or VARIABLE.")
     private String category;
 
-    @Size(max = 300, message = "La descripción no puede superar los 300 caracteres.")
+    @Size(max = 300, message = "The description cannot exceed 300 characters.")
     private String description;
 
     private LocalDate date;
 }
-
