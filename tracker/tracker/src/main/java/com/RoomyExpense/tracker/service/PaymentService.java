@@ -51,6 +51,7 @@ public class PaymentService implements IPaymentService {
         return paymentOptional.map(paymentMapper::toDTO);
     }
 
+    @Transactional
     @Override
     public Payment createPayment(PaymentCreationDTO paymentCreationDTO) {
         try {
@@ -113,6 +114,7 @@ public class PaymentService implements IPaymentService {
         }
     }
 
+    @Transactional
     @Override
     public void deletePayment(Long id){
         paymentRepository.deleteById(id);

@@ -15,20 +15,15 @@ public interface IHouseService {
 
     Optional<HouseDTO> getHouseById(Long id);
 
-    @Transactional
     void deleteHouse(Long id);
 
-    @Transactional
     HouseDTO createHouse(HouseCreationDTO houseCreationDTO);
 
     List<UserDTO> getRoommatesByHouseId(Long houseId);
 
-    @Transactional
     HouseDTO addExistingUserToHouse(Long houseId, Long userId);
 
-    @Transactional
     HouseDTO removeUserFromHouse(Long houseId, Long userId);
 
-    @Transactional
     House updateHouse(Long houseId, HouseUpdateDTO houseUpdateDTO);
 }

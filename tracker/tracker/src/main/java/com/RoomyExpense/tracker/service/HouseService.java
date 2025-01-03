@@ -46,6 +46,7 @@ public class    HouseService implements IHouseService{
                 .map(houseMapper::toDTOWithRoommates);
     }
 
+    @Transactional
     @Override
     public HouseDTO createHouse(HouseCreationDTO houseCreationDTO) {
         House house = houseMapper.toEntity(houseCreationDTO);
@@ -53,6 +54,7 @@ public class    HouseService implements IHouseService{
         return houseMapper.toDTO(savedHouse);
     }
 
+    @Transactional
     @Override
     public void deleteHouse(Long id) {
 
@@ -69,39 +71,41 @@ public class    HouseService implements IHouseService{
 
     }
 
+    @Transactional
     @Override
     public HouseDTO addExistingUserToHouse(Long houseId, Long userId) {
-        // Obtener la casa por ID
+        // Get the house by ID
         Optional<House> houseOptional = houseRepository.findById(houseId);
         if (houseOptional.isEmpty()) {
             throw new IllegalArgumentException("Casa con ID " + houseId + " no encontrada.");
         }
         House house = houseOptional.get();
 
-        // Obtener el usuario por ID
+        // Get user by ID
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             throw new IllegalArgumentException("Usuario con ID " + userId + " no encontrado.");
         }
         User user = userOptional.get();
 
-        // Verificar si el usuario ya está asignado a una casa
+        // Check if the user is already assigned to a house
         if (user.getHouse() != null) {
             throw new IllegalStateException("El usuario ya está asignado a una casa.");
         }
 
-        // Establecer la relación bidireccional
+        // Establish the bidirectional relationship
         user.setHouse(house);
         house.getRoommates().add(user);
 
-        // Guardar los cambios
+        // Save changes
         userRepository.save(user);
         houseRepository.save(house);
 
-        // Crear el DTO actualizado
+        // Create the updated DTO
         return houseMapper.toDTO(house);
     }
 
+    @Transactional
     @Override
     public HouseDTO removeUserFromHouse(Long houseId, Long userId){
         Optional<House> houseOptional = houseRepository.findById(houseId);
@@ -112,7 +116,7 @@ public class    HouseService implements IHouseService{
 
         House house = houseOptional.get();
 
-        // Buscar al usuario en la lista de roommates
+        // Search user in the roommates list
         Optional<User> userOptional = house.getRoommates().stream()
                 .filter(user -> user.getId().equals(userId))
                 .findFirst();
@@ -123,13 +127,13 @@ public class    HouseService implements IHouseService{
 
         User user = userOptional.get();
 
-        // Eliminar al usuario de la lista de roommates de la casa
+        // delete the user from the roommates list
         house.getRoommates().remove(user);
 
-        // Desasociar la casa del usuario
+        // unbind house from user
         user.setHouse(null);
 
-        // Guardar los cambios
+        // save changes
         houseRepository.save(house);
         userRepository.save(user);
 

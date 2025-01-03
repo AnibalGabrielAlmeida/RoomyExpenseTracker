@@ -49,9 +49,10 @@ public class ExpenseService implements IExpenseService {
         return expenseOptional.map(expenseMapper::toDTO);
     }
 
+    @Transactional
     @Override
     public Expense createExpense(ExpenseCreationDTO expenseCreationDTO) {
-        // Validar y buscar la casa
+        // Validate and search the house
         Optional<HouseDTO> houseOptional = houseService.getHouseById(expenseCreationDTO.getHouseId());
 
         if (houseOptional.isEmpty()) {
@@ -71,6 +72,7 @@ public class ExpenseService implements IExpenseService {
 
 
 
+    @Transactional
     @Override
     public void deleteExpense(Long id){
         expenseRepository.deleteById(id);

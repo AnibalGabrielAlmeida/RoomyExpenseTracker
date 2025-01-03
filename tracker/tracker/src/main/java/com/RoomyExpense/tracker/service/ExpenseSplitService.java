@@ -16,6 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ public class ExpenseSplitService implements IExpenseSplit {
     private ExpenseSplitMapper expenseSplitMapper;
 
 
+    @Transactional
     @Override
     public List<ExpenseSplit> createExpenseSplit(ExpenseSplitCreationDTO expenseSplitCreationDTO) {
         Optional<ExpenseDTO> expenseOptional = expenseService.getExpenseById(expenseSplitCreationDTO.getExpenseId());
@@ -52,17 +54,17 @@ public class ExpenseSplitService implements IExpenseSplit {
             throw new IllegalStateException("Expense must have a valid total amount");
         }
 
-        // Calcular el monto compartido usando streams
+        // Calculate shared amount using streams
         double sharedAmount = expenseSplitCreationDTO.getUserPercentages().stream()
                 .mapToDouble(userPercentageDTO -> totalAmount * (userPercentageDTO.getDivisionPercentage() / 100))
                 .sum();
 
-        // Asegurar que el 100% se reparta correctamente
+        // Ensure that 100% is distributed correctly
         if (sharedAmount != totalAmount) {
             throw new IllegalStateException("Total division percentage must be 100%");
         }
 
-        // Crear los ExpenseSplit en un solo flujo
+        // Create the ExpenseSplit in a single flow
         List<ExpenseSplit> expenseSplits = expenseSplitCreationDTO.getUserPercentages().stream()
                 .map(userPercentageDTO -> {
                     User user = userRepository.findById(userPercentageDTO.getUserId())
@@ -93,6 +95,7 @@ public class ExpenseSplitService implements IExpenseSplit {
         return expenseOptional.map(expenseSplitMapper::toDTO);
     }
 
+    @Transactional
     @Override
     public void deleteExpenseSplit(Long id) {
         expenseSplitRepository.deleteById(id);
@@ -101,36 +104,36 @@ public class ExpenseSplitService implements IExpenseSplit {
     @Transactional
     @Override
     public ExpenseSplit updateExpenseSplit(Long expenseSplitId, ExpenseSplitUpdateDTO expenseSplitUpdateDTO) {
-        // Obtener el ExpenseSplit a actualizar
+        // Get the ExpenseSplit to update
         ExpenseSplit expenseSplit = expenseSplitRepository.findById(expenseSplitId)
                 .orElseThrow(() -> new EntityNotFoundException("ExpenseSplit with ID: " + expenseSplitId + " not found"));
 
-        // Obtener todos los ExpenseSplits relacionados con el mismo Expense
+        // Get all ExpenseSplits related to the same Expense
         List<ExpenseSplit> allSplits = expenseSplitRepository.findByExpenseId(expenseSplit.getExpense().getId());
 
-        // Validar que hay más de un split (no tiene sentido actualizar si solo hay uno)
+        // Validate that there is more than one split (there is no point in updating if there is only one)
         if (allSplits.size() <= 1) {
             throw new IllegalStateException("Cannot update a split when there is only one associated split.");
         }
 
-        // Actualizar el monto o porcentaje del split
+        // Update the split amount or percentage
         if (expenseSplitUpdateDTO.getAmount() != null) {
             expenseSplit.setAmount(expenseSplitUpdateDTO.getAmount());
         }
 
-        // Recalcular el resto de los splits
+        // Recalculate the rest of the splits
         double updatedAmount = expenseSplit.getAmount();
         double totalAmount = expenseSplit.getExpense().getAmount();
 
-        // Validar que el nuevo monto no exceda el total
+        // Validate that the new amount does not exceed the total
         if (updatedAmount > totalAmount) {
             throw new IllegalStateException("Updated amount exceeds the total expense amount.");
         }
 
-        // Calcular cuánto queda para repartir entre los otros splits
+        // Calculate how much is left to distribute among the other splits
         double remainingAmount = totalAmount - updatedAmount;
 
-        // Actualizar los demás splits proporcionalmente
+        // Update the other splits proportionally
         List<ExpenseSplit> otherSplits = allSplits.stream()
                 .filter(split -> !split.getId().equals(expenseSplitId))
                 .collect(Collectors.toList());
@@ -142,22 +145,10 @@ public class ExpenseSplitService implements IExpenseSplit {
             otherSplit.setAmount(newAmount);
         }
 
-        // Guardar todos los cambios
+        // Save all changes
         expenseSplitRepository.saveAll(allSplits);
 
-        // Guardar y devolver el split actualizado
+        // Save and return the updated split
         return expenseSplitRepository.save(expenseSplit);
     }
-
-    /*@Transactional
-    @Override
-    public ExpenseSplit updateExpenseSplit(Long expenseSplitId, ExpenseSplitUpdateDTO expenseSplitUpdateDTO) {
-        ExpenseSplit expenseSplit = expenseSplitRepository.findById(expenseSplitId)
-                .orElseThrow(() -> new EntityNotFoundException("Expense with ID: " + expenseSplitId + " not found"));
-        if (expenseSplitUpdateDTO.getAmount() != null) {
-            expenseSplit.setAmount(expenseSplitUpdateDTO.getAmount());
-        }
-        return expenseSplitRepository.save(expenseSplit);
-    }*/
-
 }

@@ -12,12 +12,13 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Validated
-public class UserService implements  IUserService {
+public class UserService implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -48,6 +49,7 @@ public class UserService implements  IUserService {
         return userOptional.map(userMapper::toUserDTO); // mapping to user dto if it is present
     }
 
+    @Transactional
     @Override
     public UserDTO createUser(UserCreationDTO userCreationDTO) {
         System.out.println("Creating user with this information: " + userCreationDTO);
@@ -66,6 +68,7 @@ public class UserService implements  IUserService {
         return userMapper.toUserDTO(savedUser);
     }
 
+    @Transactional
     @Override
     public void deleteUser(Long id) {
 

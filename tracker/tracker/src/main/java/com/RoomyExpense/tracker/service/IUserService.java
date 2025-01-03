@@ -15,15 +15,11 @@ public interface IUserService {
 
     Optional<UserDTO> getUserById(Long id);
 
-    @Transactional
     void deleteUser(Long id);
 
-    @Transactional
     UserDTO createUser(UserCreationDTO userCreationDTO);
 
-    @Transactional
     User updateUser(Long userId, UserUpdateDTO userUpdateDTO);
 
-    @Transactional
     UserDTO changeUserRole(Long userId, UserRoleUpdateDTO updateRoleDTO);
 }

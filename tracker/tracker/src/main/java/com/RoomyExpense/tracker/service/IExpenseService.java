@@ -15,13 +15,10 @@ public interface IExpenseService {
 
     Optional<ExpenseDTO> getExpenseById(Long id);
 
-    @Transactional
     void deleteExpense(Long id);
 
-    @Transactional
     Expense createExpense(ExpenseCreationDTO expenseCreationDTO);
 
-    @Transactional
     Expense updateExpense(Long expenseId, ExpenseUpdateDTO expenseUpdateDTO);
 
     List<Expense> getExpensesByHouse(House house);

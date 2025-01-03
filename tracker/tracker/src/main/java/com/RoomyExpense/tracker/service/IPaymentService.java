@@ -15,12 +15,9 @@ public interface IPaymentService {
 
     Optional<PaymentDTO> getPaymentById(Long id);
 
-    @Transactional
     void deletePayment(Long id);
 
-    @Transactional
     Payment createPayment(PaymentCreationDTO paymentCreationDTO);
 
-    @Transactional
     Payment updatePayment(Long paymentId, PaymentUpdateDTO paymentUpdateDTO);
 }
