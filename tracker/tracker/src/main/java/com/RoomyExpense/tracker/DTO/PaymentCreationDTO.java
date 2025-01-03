@@ -11,7 +11,7 @@ public class PaymentCreationDTO {
     private Long userId;
 
     @NotNull(message = "El ID del gasto es obligatorio.")
-    private Long expenseId;
+    private Long expenseSplitId;
 
     @NotNull(message = "El monto es obligatorio.")
     @Positive(message = "El monto debe ser positivo.")
