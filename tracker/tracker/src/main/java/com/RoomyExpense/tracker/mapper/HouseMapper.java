@@ -12,22 +12,23 @@ import java.util.stream.Collectors;
 @Component
 public class HouseMapper {
 
-        public House toEntity(HouseCreationDTO dto) {
-            House house = new House();
-            house.setName(dto.getName());
-            house.setAddress(dto.getAddress());
-            return house;
-        }
+    public House toEntity(HouseCreationDTO dto) {
+        House house = new House();
+        house.setName(dto.getName());
+        house.setAddress(dto.getAddress());
+        return house;
+    }
 
-        public House DTOToEntity(HouseDTO dto){
-            House house = new House();
-            house.setName(dto.getName());
-            house.setAddress(dto.getAddress());
-            return house;
-        }
-        public HouseDTO toDTO(House house) {
-            return new HouseDTO(house.getId(), house.getName(), house.getAddress(), List.of());
-        }
+    public House DTOToEntity(HouseDTO dto) {
+        House house = new House();
+        house.setName(dto.getName());
+        house.setAddress(dto.getAddress());
+        return house;
+    }
+
+    public HouseDTO toDTO(House house) {
+        return new HouseDTO(house.getId(), house.getName(), house.getAddress(), List.of());
+    }
 
 
     public HouseDTO toDTOWithRoommates(House house) {
@@ -41,6 +42,6 @@ public class HouseMapper {
         );
     }
 
-    }
+}
 
 

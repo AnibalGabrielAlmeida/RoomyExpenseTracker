@@ -29,7 +29,7 @@ public class UserMapper {
         );
     }
 
-    public User toEntity(UserCreationDTO userCreationDTO){
+    public User toEntity(UserCreationDTO userCreationDTO) {
         User user = new User();
 
         user.setName(userCreationDTO.getName());

@@ -10,17 +10,16 @@ import java.util.Locale;
 
 @Component
 public class PaymentMapper {
-    public Payment toEntity(PaymentCreationDTO paymentCreationDTO){
+    public Payment toEntity(PaymentCreationDTO paymentCreationDTO) {
         Payment payment = new Payment();
 
         payment.setAmount(paymentCreationDTO.getAmount());
         payment.setPaymentDate(LocalDateTime.now().toLocalDate());
-        //expense y user manejado en la logica de servicio.
 
         return payment;
     }
 
-    public PaymentDTO toDTO (Payment payment){
+    public PaymentDTO toDTO(Payment payment) {
         return new PaymentDTO(
                 payment.getPaymentDate(),
                 payment.getAmount(),

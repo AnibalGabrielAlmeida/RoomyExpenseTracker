@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ExpenseMapper {
-    public Expense toEntity(ExpenseCreationDTO expenseCreationDTO){
+    public Expense toEntity(ExpenseCreationDTO expenseCreationDTO) {
         Expense expense = new Expense();
 
         expense.setName(expenseCreationDTO.getName());
@@ -19,7 +19,7 @@ public class ExpenseMapper {
         return expense;
     }
 
-    public ExpenseDTO toDTO (Expense expense){
+    public ExpenseDTO toDTO(Expense expense) {
         return new ExpenseDTO(
                 expense.getId(),
                 expense.getName(),
