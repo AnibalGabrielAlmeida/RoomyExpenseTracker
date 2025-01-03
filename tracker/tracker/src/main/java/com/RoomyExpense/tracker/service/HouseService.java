@@ -4,6 +4,8 @@ import com.RoomyExpense.tracker.DTO.HouseCreationDTO;
 import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.DTO.HouseUpdateDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
+import com.RoomyExpense.tracker.exception.HouseNotFoundException;
+import com.RoomyExpense.tracker.exception.UserNotFoundException;
 import com.RoomyExpense.tracker.mapper.HouseMapper;
 import com.RoomyExpense.tracker.mapper.UserMapper;
 import com.RoomyExpense.tracker.model.House;
@@ -42,8 +44,9 @@ public class    HouseService implements IHouseService{
 
     @Override
     public Optional<HouseDTO> getHouseById(Long id) {
-        return houseRepository.findById(id)
-                .map(houseMapper::toDTOWithRoommates);
+        House house = houseRepository.findById(id)
+                .orElseThrow(() -> new HouseNotFoundException("House with ID " + id + " not found"));
+        return Optional.of(houseMapper.toDTO(house));
     }
 
     @Transactional
@@ -57,7 +60,9 @@ public class    HouseService implements IHouseService{
     @Transactional
     @Override
     public void deleteHouse(Long id) {
-
+        if (!houseRepository.existsById(id)) {
+            throw new UserNotFoundException("House with ID " + id + " not found");
+        }
         houseRepository.deleteById(id);
     }
 
@@ -77,14 +82,14 @@ public class    HouseService implements IHouseService{
         // Get the house by ID
         Optional<House> houseOptional = houseRepository.findById(houseId);
         if (houseOptional.isEmpty()) {
-            throw new IllegalArgumentException("Casa con ID " + houseId + " no encontrada.");
+            throw new HouseNotFoundException("Casa con ID " + houseId + " no encontrada.");
         }
         House house = houseOptional.get();
 
         // Get user by ID
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("Usuario con ID " + userId + " no encontrado.");
+            throw new UserNotFoundException("Usuario con ID " + userId + " no encontrado.");
         }
         User user = userOptional.get();
 
@@ -111,7 +116,7 @@ public class    HouseService implements IHouseService{
         Optional<House> houseOptional = houseRepository.findById(houseId);
 
         if (houseOptional.isEmpty()) {
-            throw new  IllegalArgumentException("Usuario con ID " + userId + " no encontrado.");
+            throw new UserNotFoundException("Usuario con ID " + userId + " no encontrado.");
         }
 
         House house = houseOptional.get();
@@ -144,7 +149,7 @@ public class    HouseService implements IHouseService{
     @Transactional
     public House updateHouse(Long houseId, HouseUpdateDTO houseUpdateDTO) {
         House house = houseRepository.findById(houseId)
-                .orElseThrow(() -> new EntityNotFoundException("House with ID " + houseId + " not found"));
+                .orElseThrow(() -> new HouseNotFoundException("House with ID " + houseId + " not found"));
 
         if (houseUpdateDTO.getName() != null) {
             house.setName(houseUpdateDTO.getName());
