@@ -10,7 +10,8 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter@Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -26,6 +27,7 @@ public class Expense {
     public enum Category {
         FIXED, VARIABLE
     }
+
     @Enumerated(EnumType.STRING)
     private Category category;
 
