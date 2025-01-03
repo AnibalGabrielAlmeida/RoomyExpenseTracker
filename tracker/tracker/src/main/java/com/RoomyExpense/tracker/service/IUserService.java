@@ -11,13 +11,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IUserService {
-    List<UserDTO> getAllUsers ();
+    List<UserDTO> getAllUsers();
+
     Optional<UserDTO> getUserById(Long id);
+
+    @Transactional
     void deleteUser(Long id);
+
+    @Transactional
     UserDTO createUser(UserCreationDTO userCreationDTO);
 
     @Transactional
     User updateUser(Long userId, UserUpdateDTO userUpdateDTO);
 
+    @Transactional
     UserDTO changeUserRole(Long userId, UserRoleUpdateDTO updateRoleDTO);
 }

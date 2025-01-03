@@ -5,18 +5,24 @@ import com.RoomyExpense.tracker.DTO.ExpenseDTO;
 import com.RoomyExpense.tracker.DTO.ExpenseUpdateDTO;
 import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.model.House;
-import com.RoomyExpense.tracker.model.User;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface IExpenseService {
-    List<ExpenseDTO> getAllExpenses ();
+    List<ExpenseDTO> getAllExpenses();
+
     Optional<ExpenseDTO> getExpenseById(Long id);
+
+    @Transactional
     void deleteExpense(Long id);
+
+    @Transactional
     Expense createExpense(ExpenseCreationDTO expenseCreationDTO);
+
     @Transactional
     Expense updateExpense(Long expenseId, ExpenseUpdateDTO expenseUpdateDTO);
+
     List<Expense> getExpensesByHouse(House house);
 }

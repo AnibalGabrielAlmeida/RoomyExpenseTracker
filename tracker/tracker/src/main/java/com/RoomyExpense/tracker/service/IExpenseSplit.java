@@ -11,12 +11,14 @@ import java.util.Optional;
 
 public interface IExpenseSplit {
 
+    @Transactional
     List<ExpenseSplit> createExpenseSplit(ExpenseSplitCreationDTO expenseSplitCreationDTO);
 
     List<ExpenseSplitDTO> getAllExpenseSplits();
 
     Optional<ExpenseSplitDTO> getExpenseSplitById(Long id);
 
+    @Transactional
     void deleteExpenseSplit(Long id);
 
     @Transactional
