@@ -29,7 +29,7 @@ public class Payment {
 
     @ManyToOne
     @JoinColumn(name = "expense_split_id")
-    @JsonBackReference
     private ExpenseSplit expenseSplit;
+
 
 }

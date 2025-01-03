@@ -30,9 +30,9 @@ public class ExpenseSplit {
     @JsonIgnore
     private User user;
 
-    @OneToMany (mappedBy = "expense_split")
-    @JsonIgnore
+    @OneToMany(mappedBy = "expenseSplit", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;
+
 
     @Column(nullable = false)
     private Double amount;
