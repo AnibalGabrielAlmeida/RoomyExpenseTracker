@@ -1,7 +1,11 @@
 package com.RoomyExpense.tracker.service;
 
 import com.RoomyExpense.tracker.DTO.*;
+import com.RoomyExpense.tracker.exception.ExpenseNotFoundException;
+import com.RoomyExpense.tracker.exception.PaymentNotFoundException;
+import com.RoomyExpense.tracker.exception.UserNotFoundException;
 import com.RoomyExpense.tracker.mapper.PaymentMapper;
+import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.model.ExpenseSplit;
 import com.RoomyExpense.tracker.model.Payment;
 import com.RoomyExpense.tracker.model.User;
@@ -47,76 +51,66 @@ public class PaymentService implements IPaymentService {
 
     @Override
     public Optional<PaymentDTO> getPaymentById(Long id){
-        Optional<Payment> paymentOptional = paymentRepository.findById(id);
-        return paymentOptional.map(paymentMapper::toDTO);
+        Payment payment  = paymentRepository.findById(id)
+                .orElseThrow(()-> new PaymentNotFoundException("Payment with ID " + id + " not found"));
+        return Optional.of(paymentMapper.toDTO(payment));
     }
 
     @Transactional
     @Override
     public Payment createPayment(PaymentCreationDTO paymentCreationDTO) {
         try {
-            log.info("Creating payment for user ID: " + paymentCreationDTO.getUserId());
+            // Retrieve user based on ID
+            UserDTO userDTO = userService.getUserById(paymentCreationDTO.getUserId())
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-            Optional<UserDTO> userOptional = userService.getUserById(paymentCreationDTO.getUserId());
-            if (userOptional.isEmpty()) {
-                throw new EntityNotFoundException("User not found");
-            }
+            // Retrieve ExpenseSplit based on ID
+            ExpenseSplitDTO expenseSplitDTO = expenseSplitService.getExpenseSplitById(paymentCreationDTO.getExpenseSplitId())
+                    .orElseThrow(() -> new ExpenseNotFoundException("Expense not found"));
 
-            log.info("User found: " + userOptional.get());
+            User user = userRepository.findById(userDTO.getId())
+                    .orElseThrow(() -> new UserNotFoundException("User is not registered in the DB"));
 
-            Optional<ExpenseSplitDTO> expenseSplitOptional = expenseSplitService.getExpenseSplitById(paymentCreationDTO.getExpenseSplitId());
-            if (expenseSplitOptional.isEmpty()) {
-                throw new EntityNotFoundException("Expense not found");
-            }
+            ExpenseSplit expenseSplit = expenseSplitRepository.findById(expenseSplitDTO.getId())
+                    .orElseThrow(() -> new ExpenseNotFoundException("Expense is not registered in the DB"));
 
-            log.info("ExpenseSplit found: " + expenseSplitOptional.get());
-
-            User user = userRepository.findById(userOptional.get().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("User is not registered in the DB"));
-
-            ExpenseSplit expenseSplit = expenseSplitRepository.findById(expenseSplitOptional.get().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Expense is not registered in the DB"));
-
-            log.info("User: " + user + ", ExpenseSplit: " + expenseSplit);
-
+            // Validate payment amount
             if (paymentCreationDTO.getAmount() == null || paymentCreationDTO.getAmount() <= 0) {
                 throw new IllegalArgumentException("Payment amount must be a positive value.");
             }
-            if (user == null || expenseSplit == null) {
-                throw new EntityNotFoundException("User or ExpenseSplit could not be found.");
-            }
-            Double totalPagosRealizados = paymentRepository.findTotalPaymentsByExpenseSplit(expenseSplit.getId());
-            if (totalPagosRealizados == null) {
-                totalPagosRealizados = 0.0; // Asumir pagos realizados como 0 si no existen registros previos
-            }
-            log.info("Total payments made for ExpenseSplit " + expenseSplit.getId() + ": " + totalPagosRealizados);
 
-            Double montoDisponible = expenseSplit.getAmount() - totalPagosRealizados;
-            log.info("Remaining amount in ExpenseSplit " + expenseSplit.getId() + ": " + montoDisponible);
+            Double totalPaymentsMade = paymentRepository.findTotalPaymentsByExpenseSplit(expenseSplit.getId());
+            if (totalPaymentsMade == null) {
+                totalPaymentsMade = 0.0; // Assume no previous payments if none exist
+            }
 
-            if (paymentCreationDTO.getAmount() > montoDisponible) {
-                throw new IllegalArgumentException("The payment amount (" + paymentCreationDTO.getAmount() +
-                        ") exceeds the remaining amount (" + montoDisponible +
-                        ") in the ExpenseSplit.");
+            Double availableAmount = expenseSplit.getAmount() - totalPaymentsMade;
+
+            // Check if the payment amount is valid
+            if (paymentCreationDTO.getAmount() > availableAmount) {
+                throw new IllegalArgumentException("The payment amount exceeds the remaining amount in the ExpenseSplit.");
             }
 
             Payment payment = paymentMapper.toEntity(paymentCreationDTO);
             payment.setUser(user);
             payment.setExpenseSplit(expenseSplit);
 
-            Payment savedPayment = paymentRepository.save(payment);
-            log.info("Payment created successfully: " + savedPayment);
-
-            return savedPayment;
+            return paymentRepository.save(payment);
         } catch (Exception e) {
             log.severe("Error creating payment: " + e.getMessage());
             throw e;
         }
     }
 
+
+
     @Transactional
     @Override
     public void deletePayment(Long id){
+
+        if (!paymentRepository.existsById(id)) {
+            throw new UserNotFoundException("Payment with ID " + id + " not found");
+        }
         paymentRepository.deleteById(id);
     }
 
