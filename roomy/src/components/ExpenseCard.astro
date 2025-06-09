@@ -1,0 +1,10 @@
+---
+const { title, amount, date, emoji } = Astro.props;
+---
+
+<div class="bg-white rounded-xl p-4 shadow-md flex items-center justify-between">
+  <div class="text-lg">
+    <div>{emoji} {title}</div>
+    <div class="text-sm text-gray-500">${amount} · {date}</div>
+  </div>
+</div>

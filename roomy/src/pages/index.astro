@@ -1,16 +1,19 @@
 ---
-import '../styles/global.css';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ExpenseCard from "../components/ExpenseCard.astro";
+
+const expenses = [
+  { id: 1, title: "Pizza", amount: 250, date: "2025-06-03", emoji: "🍕" },
+  { id: 2, title: "Supermercado", amount: 350, date: "2025-06-01", emoji: "🛒" },
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1 class="text-4xl text-red-600">Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Roomy Tracker">
+  <a href="/nuevo" class="block text-center bg-green-600 text-white py-2 rounded-xl shadow-md mb-4">
+    + Nuevo gasto
+  </a>
+
+  {expenses.map((exp) => (
+    <ExpenseCard {...exp} />
+  ))}
+</BaseLayout>
