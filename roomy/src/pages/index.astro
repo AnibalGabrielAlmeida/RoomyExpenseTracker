@@ -2,10 +2,11 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ExpenseCard from "../components/ExpenseCard.astro";
 
-const expenses = [
-  { id: 1, title: "Pizza", amount: 250, date: "2025-06-03", emoji: "🍕" },
-  { id: 2, title: "Supermercado", amount: 350, date: "2025-06-01", emoji: "🛒" },
-];
+import type { Expense } from '../types';
+
+const response = await fetch('http://localhost:8080/api/expenses/getAll');
+const expenses: Expense[] = await response.json();
+
 ---
 
 <BaseLayout title="Roomy Tracker">
@@ -15,7 +16,11 @@ const expenses = [
     + Nuevo gasto
   </a>
 
-  {expenses.map((exp) => (
+ {expenses.length === 0 ? (
+  <p class="text-center text-text">No hay gastos registrados aún.</p>
+) : (
+  expenses.map((exp) => (
     <ExpenseCard {...exp} />
-  ))}
+  ))
+)}
 </BaseLayout>

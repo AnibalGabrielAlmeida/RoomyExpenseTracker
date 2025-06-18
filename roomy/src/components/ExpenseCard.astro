@@ -1,12 +1,32 @@
 ---
-const { title, amount, date, emoji } = Astro.props;
+// ExpenseCard.astro
+interface ExpenseCardProps {
+  name: string;
+  amount: number;
+  date: string;
+  category: string;
+  houseName: string;
+}
+
+const categoryIcons = {
+  FIXED: "🏠",         // Por ejemplo, alquiler, servicios
+  VARIABLE: "🛒",      // Compras, supermercado
+  ENTERTAINMENT: "🎮", // Salidas, juegos
+  TRANSPORT: "🚗",     // Transporte, nafta
+  OTHER: "💸"          // Otros
+};
+
+const { name, amount, date, category, houseName } = Astro.props as ExpenseCardProps;
+
+const emoji = categoryIcons[category as keyof typeof categoryIcons] ?? "💰";
 ---
 
 <div class="rounded-xl p-4 shadow-md flex items-center justify-between m-2
-          bg-background border border-secondary text-text 
-          hover:bg-hover/40 hover:scale-101 transition delay-200">
+            bg-background border border-secondary text-text 
+            hover:bg-hover/40 hover:scale-101 transition delay-200">
   <div class="text-lg">
-    <div>{emoji} {title}</div>
+    <div>{emoji} {name}</div>
     <div class="text-sm text-text">${amount} · {date}</div>
+    <div class="text-xs text-secondary">Casa: {houseName}</div>
   </div>
 </div>

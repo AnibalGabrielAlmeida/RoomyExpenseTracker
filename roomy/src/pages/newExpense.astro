@@ -1,37 +1,9 @@
 ---
+import ExpenseFormReact from "../components/ExpenseFormHandler.tsx";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 // 🧠 TODO: Mover la lógica del handleSubmit a un archivo JS aparte y enlazarlo como <script type="module" client:load>);
 ---
 <BaseLayout title="Nuevo gasto">
-  <form class="space-y-4" id="expense-form">
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-      <input type="text" name="title" required
-        class="w-full rounded-md border-gray-300 p-2 shadow-sm focus:ring focus:ring-green-500" />
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Monto</label>
-      <input type="number" name="amount" min="0" required
-        class="w-full rounded-md border-gray-300 p-2 shadow-sm focus:ring focus:ring-green-500" />
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
-      <input type="date" name="date" required
-        class="w-full rounded-md border-gray-300 p-2 shadow-sm focus:ring focus:ring-green-500" />
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Emoji</label>
-      <input type="text" name="emoji" placeholder="🍕" maxlength="2"
-        class="w-full rounded-md border-gray-300 p-2 shadow-sm focus:ring focus:ring-green-500" />
-    </div>
-
-    <button type="submit"
-      class="w-full bg-green-600 text-white py-2 rounded-md font-semibold shadow-md hover:bg-green-700">
-      Guardar gasto
-    </button>
-  </form>
+   <ExpenseFormReact client:load />
 </BaseLayout>
