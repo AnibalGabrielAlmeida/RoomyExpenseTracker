@@ -38,16 +38,12 @@ public class ExpenseController {
         }
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity<?> getAllExpenses() {
-        List<ExpenseDTO> expenseDTOs = expenseService.getAllExpenses();
-
-        if (expenseDTOs.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body("There are no expenses currently registered.");
+   @GetMapping("/getAll")
+        public ResponseEntity<List<ExpenseDTO>> getAllExpenses() {
+            List<ExpenseDTO> expenseDTOs = expenseService.getAllExpenses();
+            return ResponseEntity.ok(expenseDTOs); // siempre devuelve []
         }
 
-        return ResponseEntity.ok(expenseDTOs);
-    }
 
     @GetMapping("/getById/{id}")
     public ResponseEntity<?> getExpenseById(@PathVariable Long id) {
