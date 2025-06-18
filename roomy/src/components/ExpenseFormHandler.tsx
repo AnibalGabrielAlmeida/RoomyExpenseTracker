@@ -22,7 +22,7 @@ export default function ExpenseFormReact() {
       name: formData.name,
       amount: parseFloat(formData.amount),
       date: formData.date,
-      category: "OTHER",
+      category: "VARIABLE",
       description: "",
       houseId: 1,
     };
