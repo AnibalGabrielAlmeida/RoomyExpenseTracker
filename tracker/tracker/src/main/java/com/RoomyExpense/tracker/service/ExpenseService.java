@@ -13,7 +13,6 @@ import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.model.House;
 import com.RoomyExpense.tracker.repository.ExpenseRepository;
 import com.RoomyExpense.tracker.repository.HouseRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -41,7 +41,7 @@ public class ExpenseController {
    @GetMapping("/getAll")
         public ResponseEntity<List<ExpenseDTO>> getAllExpenses() {
             List<ExpenseDTO> expenseDTOs = expenseService.getAllExpenses();
-            return ResponseEntity.ok(expenseDTOs); // siempre devuelve []
+            return ResponseEntity.ok(expenseDTOs); 
         }
 
 

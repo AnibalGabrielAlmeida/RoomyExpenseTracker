@@ -5,8 +5,6 @@ import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.DTO.HouseUpdateDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
 import com.RoomyExpense.tracker.model.House;
-import jakarta.transaction.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 

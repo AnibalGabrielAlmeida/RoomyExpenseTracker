@@ -4,8 +4,6 @@ import com.RoomyExpense.tracker.DTO.ExpenseSplitCreationDTO;
 import com.RoomyExpense.tracker.DTO.ExpenseSplitDTO;
 import com.RoomyExpense.tracker.DTO.ExpenseSplitUpdateDTO;
 import com.RoomyExpense.tracker.model.ExpenseSplit;
-import jakarta.transaction.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 

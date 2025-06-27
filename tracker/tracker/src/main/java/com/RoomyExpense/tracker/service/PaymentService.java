@@ -5,7 +5,6 @@ import com.RoomyExpense.tracker.exception.ExpenseNotFoundException;
 import com.RoomyExpense.tracker.exception.PaymentNotFoundException;
 import com.RoomyExpense.tracker.exception.UserNotFoundException;
 import com.RoomyExpense.tracker.mapper.PaymentMapper;
-import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.model.ExpenseSplit;
 import com.RoomyExpense.tracker.model.Payment;
 import com.RoomyExpense.tracker.model.User;

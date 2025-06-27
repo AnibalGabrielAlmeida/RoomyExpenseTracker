@@ -5,8 +5,6 @@ import com.RoomyExpense.tracker.DTO.PaymentCreationDTO;
 import com.RoomyExpense.tracker.DTO.PaymentDTO;
 import com.RoomyExpense.tracker.DTO.PaymentUpdateDTO;
 import com.RoomyExpense.tracker.model.Payment;
-import jakarta.transaction.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 

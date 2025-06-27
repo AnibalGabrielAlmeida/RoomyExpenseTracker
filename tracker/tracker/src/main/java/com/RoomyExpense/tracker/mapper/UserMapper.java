@@ -3,8 +3,6 @@ package com.RoomyExpense.tracker.mapper;
 import com.RoomyExpense.tracker.DTO.UserCreationDTO;
 import com.RoomyExpense.tracker.DTO.UserDTO;
 import com.RoomyExpense.tracker.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
