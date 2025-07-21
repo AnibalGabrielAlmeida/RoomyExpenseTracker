@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: roomy-backend
+    env: docker
+    plan: free
+    autoDeploy: true
+    branch: main
+    repo: https://github.com/AnibalGabrielAlmeida/RoomyExpenseTracker
+    dockerContext: tracker/tracker
+    dockerfilePath: Dockerfile
+    healthCheckPath: /
