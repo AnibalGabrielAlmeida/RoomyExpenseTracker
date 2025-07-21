@@ -16,9 +16,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/expenses")
+@Tag(name = "Expense Management", description = "Operations related to Expense management")
 public class ExpenseController {
 
     @Autowired
@@ -27,8 +36,24 @@ public class ExpenseController {
     @Autowired
     private IHouseService houseService;
 
+    @Operation(
+        summary = "Create a new expense",
+        description = "Creates a new expense with the provided information."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Expense created successfully",
+            content = @Content(schema = @Schema(implementation = Expense.class))),
+        @ApiResponse(responseCode = "404", description = "Related entity not found"),
+        @ApiResponse(responseCode = "400", description = "Bad request")
+    })
     @PostMapping("/createExpense")
-    public ResponseEntity<?> createExpense(@RequestBody ExpenseCreationDTO expenseCreationDTO) {
+    public ResponseEntity<?> createExpense(
+            @RequestBody(
+                description = "Expense creation data",
+                required = true,
+                content = @Content(schema = @Schema(implementation = ExpenseCreationDTO.class))
+            )
+            @org.springframework.web.bind.annotation.RequestBody ExpenseCreationDTO expenseCreationDTO) {
         try {
             Expense expense = expenseService.createExpense(expenseCreationDTO);
             return ResponseEntity.status(HttpStatus.CREATED)
@@ -40,15 +65,33 @@ public class ExpenseController {
         }
     }
 
-   @GetMapping("/getAll")
-        public ResponseEntity<List<ExpenseDTO>> getAllExpenses() {
-            List<ExpenseDTO> expenseDTOs = expenseService.getAllExpenses();
-            return ResponseEntity.ok(expenseDTOs); 
-        }
+    @Operation(
+        summary = "Get all expenses",
+        description = "Returns a list of all registered expenses."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "List of expenses",
+            content = @Content(schema = @Schema(implementation = ExpenseDTO.class)))
+    })
+    @GetMapping("/getAll")
+    public ResponseEntity<List<ExpenseDTO>> getAllExpenses() {
+        List<ExpenseDTO> expenseDTOs = expenseService.getAllExpenses();
+        return ResponseEntity.ok(expenseDTOs); 
+    }
 
-
+    @Operation(
+        summary = "Get expense by ID",
+        description = "Returns an expense by its ID."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Expense found",
+            content = @Content(schema = @Schema(implementation = ExpenseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Expense not found")
+    })
     @GetMapping("/getById/{id}")
-    public ResponseEntity<?> getExpenseById(@PathVariable Long id) {
+    public ResponseEntity<?> getExpenseById(
+            @Parameter(description = "ID of the expense to retrieve", required = true)
+            @PathVariable Long id) {
         Optional<ExpenseDTO> expenseDTO = expenseService.getExpenseById(id);
 
         if (expenseDTO.isPresent()) {
@@ -59,8 +102,18 @@ public class ExpenseController {
         }
     }
 
+    @Operation(
+        summary = "Delete expense by ID",
+        description = "Deletes an expense by its ID."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Expense deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Expense not found")
+    })
     @DeleteMapping("/deleteById/{id}")
-    public ResponseEntity<?> deleteExpenseById(@PathVariable Long id) {
+    public ResponseEntity<?> deleteExpenseById(
+            @Parameter(description = "ID of the expense to delete", required = true)
+            @PathVariable Long id) {
         return expenseService.getExpenseById(id)
                 .map(expenseDTO -> {
                     expenseService.deleteExpense(id);
@@ -69,20 +122,45 @@ public class ExpenseController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense with ID " + id + " not found."));
     }
 
+    @Operation(
+        summary = "Update expense",
+        description = "Updates expense information by ID."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Expense updated successfully",
+            content = @Content(schema = @Schema(implementation = Expense.class))),
+        @ApiResponse(responseCode = "404", description = "Expense not found")
+    })
     @PatchMapping("/updateExpense/{expenseId}")
     public ResponseEntity<Expense> updateExpense(
+            @Parameter(description = "ID of the expense to update", required = true)
             @PathVariable Long expenseId,
-            @RequestBody ExpenseUpdateDTO expenseUpdateDTO) {
+            @RequestBody(
+                description = "Expense update data",
+                required = true,
+                content = @Content(schema = @Schema(implementation = ExpenseUpdateDTO.class))
+            )
+            @org.springframework.web.bind.annotation.RequestBody ExpenseUpdateDTO expenseUpdateDTO) {
 
         Expense updatedExpense = expenseService.updateExpense(expenseId, expenseUpdateDTO);
 
         return ResponseEntity.ok(updatedExpense);
     }
 
-    /* 
-    // Obtener gastos por ID de casa
+    /*
+    @Operation(
+        summary = "Get expenses by house ID",
+        description = "Returns a list of expenses for a given house."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "List of expenses for the house",
+            content = @Content(schema = @Schema(implementation = ExpenseDTO.class))),
+        @ApiResponse(responseCode = "404", description = "House not found")
+    })
     @GetMapping("/getByHouse/{houseId}")
-    public ResponseEntity<?> getExpensesByHouse(@PathVariable Long houseId) {
+    public ResponseEntity<?> getExpensesByHouse(
+            @Parameter(description = "ID of the house", required = true)
+            @PathVariable Long houseId) {
         Optional<HouseDTO> house = houseService.getHouseById(houseId);
 
         if (!house.isPresent()) {
@@ -103,12 +181,12 @@ public class ExpenseController {
                         expense.getAmount(),
                         expense.getCategory().toString(),
                         expense.getDate(),
-                        expense.getHouse().getName(),  // Nombre de la casa
+                        expense.getHouse().getName(),
                         expense.getHouse().getId()
                 ))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(expenseDTOs);
     }
-*/
+    */
 }
