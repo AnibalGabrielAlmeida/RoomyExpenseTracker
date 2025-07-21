@@ -14,15 +14,42 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/expense-splits")
+@Tag(name = "Expense Split Management", description = "Operations related to Expense Split management")
 public class ExpenseSplitController {
 
     @Autowired
     private ExpenseSplitService expenseSplitService;
 
+    @Operation(
+        summary = "Create a new expense split",
+        description = "Creates a new expense split with the provided information."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Expense split created successfully",
+            content = @Content(schema = @Schema(implementation = ExpenseSplit.class))),
+        @ApiResponse(responseCode = "404", description = "Related entity not found"),
+        @ApiResponse(responseCode = "400", description = "Bad request"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/createExpenseSplit")
-    public ResponseEntity<?> createExpenseSplit(@RequestBody ExpenseSplitCreationDTO expenseSplitCreationDTO) {
+    public ResponseEntity<?> createExpenseSplit(
+            @RequestBody(
+                description = "Expense split creation data",
+                required = true,
+                content = @Content(schema = @Schema(implementation = ExpenseSplitCreationDTO.class))
+            )
+            @org.springframework.web.bind.annotation.RequestBody ExpenseSplitCreationDTO expenseSplitCreationDTO) {
         try {
             List<ExpenseSplit> expenseSplits = expenseSplitService.createExpenseSplit(expenseSplitCreationDTO);
             StringBuilder response = new StringBuilder();
@@ -44,9 +71,14 @@ public class ExpenseSplitController {
         }
     }
 
-
-
-
+    @Operation(
+        summary = "Get all expense splits",
+        description = "Returns a list of all registered expense splits."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "List of expense splits or message if empty",
+            content = @Content(schema = @Schema(implementation = ExpenseSplitDTO.class)))
+    })
     @GetMapping("/getAll")
     public ResponseEntity<?> getAllExpenseSplits() {
         List<ExpenseSplitDTO> expenseSplitDTOS = expenseSplitService.getAllExpenseSplits();
@@ -56,27 +88,64 @@ public class ExpenseSplitController {
         return ResponseEntity.ok(expenseSplitDTOS);
     }
 
+    @Operation(
+        summary = "Get expense split by ID",
+        description = "Returns an expense split by its ID."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Expense split found",
+            content = @Content(schema = @Schema(implementation = ExpenseSplitDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Expense split not found")
+    })
     @GetMapping("/getById/{id}")
-    public ResponseEntity<?> getExpenseSplitById(@PathVariable Long id) {
+    public ResponseEntity<?> getExpenseSplitById(
+            @Parameter(description = "ID of the expense split to retrieve", required = true)
+            @PathVariable Long id) {
         Optional<ExpenseSplitDTO> expenseSplitDTO = expenseSplitService.getExpenseSplitById(id);
         if (expenseSplitDTO.isEmpty()){
-            return ResponseEntity.status(HttpStatus.OK).body("Expense Split not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense Split not found");
         }
         return ResponseEntity.ok(expenseSplitDTO.get());
     }
 
+    @Operation(
+        summary = "Delete expense split by ID",
+        description = "Deletes an expense split by its ID."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Expense split deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Expense split not found")
+    })
     @DeleteMapping("/deleteById/{id}")
-    public ResponseEntity<?> deleteExpenseSplit(@PathVariable Long id){
+    public ResponseEntity<?> deleteExpenseSplit(
+            @Parameter(description = "ID of the expense split to delete", required = true)
+            @PathVariable Long id){
         return expenseSplitService.getExpenseSplitById(id)
                 .map(expenseSplitDTO -> {expenseSplitService.deleteExpenseSplit(id);
                 return ResponseEntity.status(HttpStatus.OK).body("Expense Split with Id: " + id + " Succesfully eliminated.");
                 }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense Split with Id: " + id + " not found"));
     }
 
+    @Operation(
+        summary = "Update expense split",
+        description = "Updates expense split information by ID."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Expense split updated successfully",
+            content = @Content(schema = @Schema(implementation = ExpenseSplit.class))),
+        @ApiResponse(responseCode = "404", description = "Expense split not found"),
+        @ApiResponse(responseCode = "400", description = "Bad request")
+    })
     @PatchMapping("/updateExpenseSplit/{expenseSplitId}")
     public ResponseEntity<ExpenseSplit> updateExpenseSplit(
+            @Parameter(description = "ID of the expense split to update", required = true)
             @PathVariable Long expenseSplitId,
-            @RequestBody ExpenseSplitUpdateDTO expenseSplitUpdateDTO) {
+            @RequestBody(
+                description = "Expense split update data",
+                required = true,
+                content = @Content(schema = @Schema(implementation = ExpenseSplitUpdateDTO.class))
+            )
+            @org.springframework.web.bind.annotation.RequestBody ExpenseSplitUpdateDTO expenseSplitUpdateDTO) {
         try {
             ExpenseSplit updatedExpenseSplit = expenseSplitService.updateExpenseSplit(expenseSplitId, expenseSplitUpdateDTO);
             return ResponseEntity.ok(updatedExpenseSplit);
