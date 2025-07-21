@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import Header from "../components/Header.astro";
+import Header from "../components/Header.tsx";
 
 ---
 
@@ -11,7 +11,7 @@ import Header from "../components/Header.astro";
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body class="bg-background min-h-screen font-sans">
-    <Header title="Roomy Expense Tracker"/>
+    <Header/>
 
     <main class="p-4">
       <slot />

@@ -5,7 +5,9 @@ import com.RoomyExpense.tracker.DTO.ExpenseUpdateDTO;
 import com.RoomyExpense.tracker.model.Expense;
 import com.RoomyExpense.tracker.service.IExpenseService;
 import com.RoomyExpense.tracker.DTO.ExpenseDTO;
+import com.RoomyExpense.tracker.DTO.HouseDTO;
 import com.RoomyExpense.tracker.service.IHouseService;
+import com.RoomyExpense.tracker.model.House;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -77,17 +79,17 @@ public class ExpenseController {
         return ResponseEntity.ok(updatedExpense);
     }
 
-    /*
+    /* 
     // Obtener gastos por ID de casa
     @GetMapping("/getByHouse/{houseId}")
     public ResponseEntity<?> getExpensesByHouse(@PathVariable Long houseId) {
-        Optional<House> house = houseService.getHouseById(houseId);
+        Optional<HouseDTO> house = houseService.getHouseById(houseId);
 
         if (!house.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Casa no encontrada.");
         }
 
-        List<Expense> expenses = expenseService.getExpensesByHouse(house.get());
+        List<Expense> expenses = expenseService.getExpensesByHouseId(house.get().getId());
 
         if (expenses.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body("No hay gastos registrados para esta casa.");
@@ -107,6 +109,6 @@ public class ExpenseController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(expenseDTOs);
-    }*/
-
+    }
+*/
 }
