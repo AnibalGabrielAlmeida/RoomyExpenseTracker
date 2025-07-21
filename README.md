@@ -1,4 +1,4 @@
-Roomy Expense Tracker - Backend API
+# Roomy Expense Tracker - Backend API
 
 Roomy Expense Tracker is a backend application to manage and split expenses among people sharing the same property.  
 It allows managing fixed and variable expenses, initially dividing them equally and later allowing customized splits.
@@ -16,13 +16,13 @@ The backend is deployed and publicly accessible here:
 
 ---
 
-## Technologies
+## 🛠️ Technologies
 
-- Java 17 + Spring Boot  
-- In-memory H2 database (development)  
-- Swagger UI for documentation and testing  
-- JPA / Hibernate for persistence  
-- Postman collection for automated tests  
+- ☕ Java 17 + Spring Boot  
+- 🗄️ In-memory H2 database (development)  
+- 📖 Swagger UI for documentation and testing  
+- 🗃️ JPA / Hibernate for persistence  
+- 🧪 Postman collection for automated tests  
 
 ---
 
@@ -39,7 +39,7 @@ http://localhost:8080/swagger-ui/index.html
 
 ---
 
-## 🛠️ Configuration
+## ⚙️ Configuration
 
 ```properties
 spring.application.name=tracker
@@ -52,14 +52,14 @@ spring.jpa.hibernate.ddl-auto=create-drop
 
 ---
 
-## H2 Web Console
+## 🗃️ H2 Web Console
 
 The H2 web console is available at:  
 http://localhost:8080/h2-console
 
 ---
 
-## API Documentation
+## 📑 API Documentation
 
 Swagger documentation is available at:  
 http://localhost:8080/swagger-ui/index.html
@@ -70,7 +70,7 @@ A Postman collection is also included for comprehensive testing.
 
 ---
 
-## 📲 Frontend Integration
+## 🖼️ Frontend Integration
 
 To use the API from a frontend, use:
 
@@ -84,20 +84,20 @@ We recommend storing the API base URL in an environment variable or configuratio
 
 ## 💡 Important Notes
 
-- The current setup is for demo purposes only.
-- Data is stored in-memory (H2), and resets when the server restarts or sleeps.
-- There is no authentication or authorization yet – all endpoints are open.
-- The backend is designed to be consumed by a separate frontend application, which is not included in this repository.
+- ⚠️ The current setup is for demo purposes only.
+- 🗄️ Data is stored in-memory (H2), and resets when the server restarts or sleeps.
+- 🔓 There is no authentication or authorization yet – all endpoints are open.
+- 🖥️ The backend is designed to be consumed by a separate frontend application, which is not included in this repository.
 
 ---
 
-## Contact
+## 📞 Contact
 
 Gabriel Almeida – almeida.g.dev@gmail.com
 
 ---
 
-## Notes
+## 📝 Notes
 
 This repository contains only the backend, separated from the frontend to facilitate independent deployments and collaboration with frontend teams.
 
