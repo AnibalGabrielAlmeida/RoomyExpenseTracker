@@ -8,8 +8,7 @@ It allows managing fixed and variable expenses, initially dividing them equally 
 ## 🌐 Live API (Demo Deployment)
 
 The backend is deployed and publicly accessible here:
-
-- **Base URL:** https://roomyexpensetracker.onrender.com  
+ 
 - **Swagger UI:** https://roomyexpensetracker.onrender.com/swagger-ui/index.html
 
 > ⚠️ Note: This is a free Render instance. It may take **30–50 seconds** to wake up after a period of inactivity.
@@ -54,7 +53,7 @@ spring.jpa.hibernate.ddl-auto=create-drop
 
 ## 🗃️ H2 Web Console
 
-The H2 web console is available at:  
+The H2 web console is only available locally at:  
 http://localhost:8080/h2-console
 
 ---
@@ -62,7 +61,7 @@ http://localhost:8080/h2-console
 ## 📑 API Documentation
 
 Swagger documentation is available at:  
-http://localhost:8080/swagger-ui/index.html
+https://roomyexpensetracker.onrender.com/swagger-ui/index.html
 
 This interface allows testing all endpoints without running the backend locally.
 
@@ -87,7 +86,7 @@ We recommend storing the API base URL in an environment variable or configuratio
 - ⚠️ The current setup is for demo purposes only.
 - 🗄️ Data is stored in-memory (H2), and resets when the server restarts or sleeps.
 - 🔓 There is no authentication or authorization yet – all endpoints are open.
-- 🖥️ The backend is designed to be consumed by a separate frontend application, which is not included in this repository.
+- 🖥️ This backend is intended to be used by a separate frontend application, developed independently for modularity and flexibility.
 
 ---
 
